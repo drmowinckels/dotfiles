@@ -1,0 +1,60 @@
+{
+  "$schema": "https://opencode.ai/config.schema.json",
+
+  // Use Claude as the primary model (matches Claude Code)
+  "model": "anthropic/claude-sonnet-4-5",
+  "small_model": "anthropic/claude-haiku-3-5",
+
+  // Load instructions from Claude Code's CLAUDE.md
+  // Project-specific instructions (.github/copilot-instructions.md) go in project opencode.json
+  "instructions": [
+    "{file:~/.claude/CLAUDE.md}"
+  ],
+
+  // MCP servers - mirrors Claude Code settings.json
+  "mcp": {
+    "filesystem": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem", "~/workspace"],
+      "enabled": true
+    }
+  },
+
+  // Tool permissions
+  "permission": {
+    "write": "ask",
+    "bash": "ask",
+    "skill": {
+      "*": "allow"
+    }
+  },
+
+  // File exclusions (matches Claude Code fileExclusions)
+  "watcher": {
+    "ignore": [
+      ".Rproj.user/**",
+      ".Rhistory",
+      ".RData",
+      ".Ruserdata",
+      "*_cache/**",
+      "*.Rproj",
+      "node_modules/**",
+      ".git/**",
+      "*.log",
+      "revdep/**",
+      "docs/**",
+      "*.html",
+      "*.pdf",
+      ".httr-oauth",
+      ".DS_Store",
+      "public/**",
+      "resources/**",
+      ".hugo_build.lock"
+    ]
+  },
+
+  // TUI preferences
+  "tui": {
+    "diff_style": "auto"
+  }
+}

@@ -1,0 +1,105 @@
+# Brewfile - Homebrew packages and applications
+# Run: brew bundle --file=Brewfile
+
+# ==============================================================================
+# AI
+# ==============================================================================
+
+cask 'claude-code'
+brew 'anomalyco/tap/opencode'
+brew 'opencode'
+
+# ==============================================================================
+# Core System Tools
+# ==============================================================================
+
+brew 'bash'                 # Updated bash shell
+brew 'coreutils'            # GNU core utilities
+brew 'git'                  # Version control
+brew 'zsh'                  # Z shell
+brew 'zsh-completions'      # Additional zsh completions
+brew 'zsh-syntax-highlighting'  # Syntax highlighting for zsh
+
+# ==============================================================================
+# Development Tools
+# ==============================================================================
+
+brew 'pkg-config'           # Package configuration tool
+brew 'npm'                  # Node package manager
+brew 'hugo'                 # Static site generator
+brew 'air'                  # Live reload for Go apps
+brew 'opencode'             # AI-powered coding assistant
+
+# ==============================================================================
+# CLI Utilities
+# ==============================================================================
+
+brew 'tree'                 # Directory tree visualization
+brew 'fzf'                  # Fuzzy finder for terminal
+brew 'jq'                   # JSON processor
+brew 'yq'                   # YAML processor
+brew 'ccat'                 # Colorized cat
+brew 'curl-openssl'         # curl with OpenSSL
+
+# ==============================================================================
+# Geospatial Libraries
+# ==============================================================================
+
+brew 'gdal'                 # Geospatial Data Abstraction Library
+brew 'geos'                 # Geometry Engine Open Source
+
+# ==============================================================================
+# GUI Applications - Productivity
+# ==============================================================================
+
+cask 'google-chrome'        # Web browser
+cask 'dropbox'              # Cloud storage
+cask 'bitwarden'            # Password manager
+cask '1password'            # Alternative password manager
+cask 'stretchly', args: { no_quarantine: true }  # Break reminder
+
+# ==============================================================================
+# GUI Applications - Communication
+# ==============================================================================
+
+cask 'mattermost'           # Team communication
+cask 'slack'                # Team communication
+
+# ==============================================================================
+# GUI Applications - Development & Data Science
+# ==============================================================================
+
+cask 'positron'             # IDE for data science
+cask 'docker'               # Container platform
+cask 'r-app'                # R statistical computing
+cask 'quarto'               # Scientific publishing system
+
+# ==============================================================================
+# GUI Applications - Research & Documentation
+# ==============================================================================
+
+cask 'zotero'               # Reference manager
+cask 'adobe-acrobat-reader' # PDF reader
+cask 'inkscape'             # Vector graphics editor
+
+# ==============================================================================
+# GUI Applications - System
+# ==============================================================================
+
+cask 'xquartz'              # X11 for macOS
+
+# ==============================================================================
+# GUI Applications - Media
+# ==============================================================================
+
+cask 'spotify'              # Music streaming
+
+# ==============================================================================
+# Fonts
+# ==============================================================================
+
+cask 'font-fira-code'       # Monospace font with ligatures
+cask 'font-lato'            # Sans-serif font
+cask 'font-input'           # Monospace font for code
+cask 'font-open-sans'       # Sans-serif font
+cask 'font-roboto'          # Sans-serif font

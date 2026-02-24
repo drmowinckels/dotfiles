@@ -1,0 +1,103 @@
+{
+  "editor.wordWrap": "bounded",
+  "editor.fontLigatures": true,
+  "[r]": {
+    "editor.formatOnSave": true
+  },
+  "[quarto]": {
+    "editor.formatOnSave": true
+  },
+  "[html]": {
+    "editor.formatOnSave": false
+  },
+  "workbench.colorTheme": "Default Dark Modern",
+  "positron.r.quietMode": true,
+  "database-client.autoSync": true,
+  "git.autofetch": true,
+  "githubPullRequests.pullBranch": "never",
+  "githubPullRequests.pushBranch": "always",
+  "python.defaultInterpreterPath": "/opt/homebrew/bin/python3",
+  "gitlens.defaultDateFormat": "YYYY-MM-D hh:mm",
+  "gitlens.defaultDateShortFormat": "YYYY-MM-D",
+  "gitlens.defaultTimeFormat": "hh:mm",
+  "[makefile]": {
+    "editor.insertSpaces": false,
+    "editor.detectIndentation": false
+  },
+  "editor.suggestSelection": "first",
+  "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+  "editor.fontFamily": "JetBrains Mono, 'Courier New', monospace",
+  "editor.inlineSuggest.enabled": true,
+  "workbench.editor.enablePreview": false,
+  "editor.autoClosingBrackets": "always",
+  "editor.autoClosingQuotes": "always",
+  "editor.autoClosingOvertype": "always",
+  "window.zoomLevel": 1,
+  "terminal.integrated.enableMultiLinePasteWarning": false,
+  "r.alwaysUseActiveTerminal": true,
+  "r.lsp.debug": true,
+  "r.plot.useHttpgd": true,
+  "r.removeLeadingComments": true,
+  "r.rmarkdown.knit.openOutputFile": true,
+  "r.workspaceViewer.removeHiddenItems": true,
+  "diffEditor.wordWrap": "on",
+  "colorize.languages": [
+    "javascript",
+    "r",
+    "python",
+    "css",
+    "html",
+    "mermaid",
+    "markdown",
+    "yaml",
+    "json"
+    // ...
+  ],
+  "chatgpt.lang": "en",
+  "github.copilot.enable": {
+    "quarto": false,
+    "*": true
+  },
+  "codestream.serverUrl": "https://codestream-us1.service.newrelic.com",
+  "files.associations": {
+    "renv.lock": "json"
+  },
+  "yaml.schemas": {
+    "file:///Users/athanasm/.positron/extensions/continue.continue-1.2.8-darwin-arm64/config-yaml-schema.json": [
+      ".continue/**/*.yaml"
+    ]
+  },
+  "workbench.startupEditor": "readme",
+  "files.autoGuessEncoding": true,
+  "interpreters.startupBehavior": "manual",
+  "positron.assistant.enable": true,
+  "workbench.keybindings.rstudioKeybindings": true,
+  "redhat.telemetry.enabled": false,
+  "markdown.preview.fontSize": 12,
+  "editor.formatOnSave": true,
+  "[dockercompose]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.autoIndent": "advanced",
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "terminal.integrated.shellIntegration.enabled": false,
+  "terminal.integrated.suggest.enabled": false,
+  "positron.assistant.toolDetails.enable": true,
+  "chat.mcp.serverSampling": {},
+  "update.positron.channel": "release",
+  "diffEditor.ignoreTrimWhitespace": true,
+  "diffEditor.experimental.showMoves": true,
+  "security.workspace.trust.untrustedFiles": "open",
+  "opencode.configDir": "${env:HOME}/.dotfiles/opencode",
+  "terminal.integrated.env.osx": {
+    "OPENCODE_CONFIG_DIR": "${env:HOME}/.dotfiles/opencode"
+  },
+  "terminal.integrated.env.linux": {
+    "OPENCODE_CONFIG_DIR": "${env:HOME}/.dotfiles/opencode"
+  },
+  "github.copilot.chat.customOAIModels": {}
+}

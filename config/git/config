@@ -1,0 +1,28 @@
+[user]
+	name = Athanasia Monika Mowinckel
+	email = a.m.mowinckel@psykologi.uio.no
+[credential]
+	helper = cache --timeout 3600
+[push]
+	followTags = true
+	autoSetupRemote = true
+[pull]
+	rebase = true
+[core]
+	quotePath = false
+	commitGraph = true
+	excludesfile = /Users/athanasm/.gitignore
+	editor = vi
+[receive]
+	advertisePushOptions = true
+[gc]
+	writeCommitGraph = true
+[init]
+	defaultBranch = main
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+[pager]
+	branch = false

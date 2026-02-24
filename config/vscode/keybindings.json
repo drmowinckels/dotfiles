@@ -1,0 +1,30 @@
+[
+    {
+        "key": "ctrl+cmd+k",
+        "command": "quarto.renderDocument"
+    },
+    {
+        "key": "shift+cmd+[Semicolon]",
+        "command": "continue.focusContinueInputWithoutClear"
+    },
+    {
+        "key": "shift+cmd+l",
+        "command": "-continue.focusContinueInputWithoutClear"
+    },
+    {
+        "key": "shift+cmd+[Minus]",
+        "command": "workbench.action.zoomIn"
+    },
+    {
+        "key": "shift+cmd+0",
+        "command": "-workbench.action.zoomIn"
+    },
+    {
+        "key": "shift+enter",
+        "command": "workbench.action.terminal.sendSequence",
+        "args": {
+            "text": "\u001b\r"
+        },
+        "when": "terminalFocus"
+    }
+]

@@ -1,0 +1,30 @@
+install.packages("pak")
+pak::pkg_install(
+    c(
+        "blogdown",
+        "praise",
+        "covr",
+        "devtools",
+        "httr2",
+        "janitor",
+        "knitr",
+        "lintr",
+        "pkgdown",
+        "quarto",
+        "renv",
+        "reprex",
+        "rmarkdown",
+        "roxygen2",
+        "styler",
+        "testthat",
+        "tidyverse",
+        "usethis",
+        "vcr",
+        "vdiffr",
+        "ellmer",
+        "mcptools",
+        "btw"
+    ),
+    upgrade = TRUE,
+    ask = FALSE
+)

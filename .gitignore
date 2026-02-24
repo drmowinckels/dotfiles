@@ -1,0 +1,17 @@
+.DS_Store
+Brewfile.lock.json
+.pytest_cache/
+.vscode/
+.history
+push_errors.log
+
+# Environment files with secrets
+.env
+.env.local
+.claude
+
+**/*cache*
+config/claude/plugins/
+config/claude/tasks/
+config/claude/backups/
+config/claude/ide/

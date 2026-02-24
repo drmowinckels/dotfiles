@@ -1,0 +1,20 @@
+# Claude Code runtime files
+debug/
+file-history/
+history.jsonl
+projects/
+session-env/
+shell-snapshots/
+statsig/
+todos/
+*cache*
+plans
+telemetry
+
+# Credentials and tokens
+credentials.json
+*.token
+
+# Local overrides
+settings.local.json
+plugins/

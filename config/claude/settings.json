@@ -1,0 +1,73 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/opt/homebrew/bin/Rscript:*)",
+      "Bash(R:*)",
+      "WebFetch(domain:rdrr.io)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:netneurolab.github.io)",
+      "WebFetch(domain:brainsmash.readthedocs.io)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:brainspace.readthedocs.io)",
+      "Bash(grep:*)",
+      "WebFetch(domain:roxygen2.r-lib.org)",
+      "Bash(git revert:*)",
+      "WebFetch(domain:covr.r-lib.org)",
+      "Bash(gh issue list:*)"
+    ]
+  },
+  "model": "opus",
+  "enabledPlugins": {
+    "r-lib@posit-dev-skills": true,
+    "quarto@posit-dev-skills": true,
+    "shiny@posit-dev-skills": true,
+    "open-source@posit-dev-skills": true,
+    "document-skills@anthropic-agent-skills": true,
+    "example-skills@anthropic-agent-skills": true,
+    "writing-voices@straight-talk": true
+  },
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "~/workspace"
+      ]
+    }
+  },
+  "customInstructions": "",
+  "alwaysAllowWriteOperation": false,
+  "dangerouslyIgnorePathSafety": false,
+  "fileExclusions": [
+    ".Rproj.user/**",
+    ".Rhistory",
+    ".RData",
+    ".Ruserdata",
+    "*_cache/**",
+    "*.Rproj",
+    "node_modules/**",
+    ".git/**",
+    "*.log",
+    "revdep/**",
+    "docs/**",
+    "*.html",
+    "*.pdf",
+    ".httr-oauth",
+    ".DS_Store",
+    "public/**",
+    "resources/**",
+    ".hugo_build.lock"
+  ],
+  "environmentVariables": {
+    "R_LIBS_USER": "~/R/library",
+    "GITHUB_PAT": "${GITHUB_PAT}"
+  },
+  "autoApprovePatterns": [
+    "**/*.Rd",
+    "**/NEWS.md",
+    "**/.Rbuildignore",
+    "**/NAMESPACE",
+    "**/man/**"
+  ]
+}

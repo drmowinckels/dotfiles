@@ -1,0 +1,12 @@
+# Set auto use sockets
+Host 192.168.39.101
+  HostName 192.168.39.101
+
+Host *
+  ControlMaster auto
+  ControlPath ~/.ssh/controlsock-%h-%p
+
+Host *
+  UseKeychain yes
+  AddKeysToAgent yes
+  IdentityFile ~/.ssh/id_ed25519

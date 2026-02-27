@@ -8,6 +8,9 @@ alias c='clear'
 alias fnd='ps ax | grep'
 alias cat='ccat'
 
+# ast-grep with R support
+alias sg='ast-grep run -c ~/.config/ast-grep/sgconfig.yml'
+
 # Dotfiles
 alias dot='cd $DOTFILES'
 alias dotup='$DOTFILES/update.sh'

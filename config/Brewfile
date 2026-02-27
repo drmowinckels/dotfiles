@@ -24,6 +24,7 @@ brew 'zsh-syntax-highlighting'  # Syntax highlighting for zsh
 # Development Tools
 # ==============================================================================
 
+brew 'ast-grep'             # Structural code search
 brew 'pkg-config'           # Package configuration tool
 brew 'npm'                  # Node package manager
 brew 'hugo'                 # Static site generator

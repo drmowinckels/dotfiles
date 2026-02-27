@@ -35,6 +35,11 @@ safe_symlink "$DOTFILES/config/vscode/keybindings.json" "$VSCODE_USER_DIR/keybin
 
 safe_symlink "$DOTFILES/config/claude" "$HOME/.claude"
 
+if [ ! -d "$HOME/.config/ast-grep" ]; then
+    mkdir -p "$HOME/.config/ast-grep"
+fi
+safe_symlink "$DOTFILES/config/ast-grep/sgconfig.yml" "$HOME/.config/ast-grep/sgconfig.yml"
+
 if [ ! -d "$HOME/.config/opencode" ]; then
     mkdir -p "$HOME/.config/opencode"
 fi

@@ -31,4 +31,27 @@ else
     log_warn "R not found, skipping R package installation"
 fi
 
+if command -v npm >/dev/null 2>&1; then
+    log_info "Installing global npm packages..."
+    npm install -g tree-sitter-cli
+else
+    log_warn "npm not found, skipping global npm packages"
+fi
+
+if command -v ast-grep >/dev/null 2>&1 && command -v tree-sitter >/dev/null 2>&1; then
+    ast_grep_dir="$HOME/.config/ast-grep"
+    if [ ! -f "$ast_grep_dir/r.dylib" ]; then
+        log_info "Building ast-grep R grammar..."
+        mkdir -p "$ast_grep_dir"
+        tmp_dir=$(mktemp -d)
+        git clone --depth 1 https://github.com/r-lib/tree-sitter-r.git "$tmp_dir/tree-sitter-r"
+        tree-sitter build --output "$ast_grep_dir/r.dylib" "$tmp_dir/tree-sitter-r"
+        rm -rf "$tmp_dir"
+    else
+        log_info "ast-grep R grammar already built"
+    fi
+else
+    log_warn "ast-grep or tree-sitter not found, skipping R grammar build"
+fi
+
 log_info "Application setup complete!"

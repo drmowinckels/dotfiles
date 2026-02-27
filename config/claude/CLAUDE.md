@@ -10,6 +10,16 @@
 - R: use r-lib/actions for GitHub Actions workflows
 - Hugo: semantic CSS classes, minimal JS, npm-based workflows
 
+# ast-grep with R support
+
+R language support configured globally via `~/.config/ast-grep/sgconfig.yml`.
+
+```bash
+sg -l r -p 'pattern' .
+```
+
+Use `_VAR` for named metavariables and `___` for wildcards (not `$VAR`) because R uses `$` for column access.
+
 # Repo Instruction Files
 
 In repos with `.github/copilot-instructions.md` files, use these as instructions for the repo.

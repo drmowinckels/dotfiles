@@ -32,8 +32,16 @@ else
 fi
 
 if command -v npm >/dev/null 2>&1; then
-    log_info "Installing global npm packages..."
-    npm install -g tree-sitter-cli
+    packages_file="$DOTFILES/config/npm/global-packages.txt"
+    if [ -f "$packages_file" ]; then
+        log_info "Installing global npm packages..."
+        while IFS= read -r pkg || [ -n "$pkg" ]; do
+            [ -z "$pkg" ] && continue
+            npm install -g "$pkg"
+        done < "$packages_file"
+    else
+        log_warn "npm packages file not found: $packages_file"
+    fi
 else
     log_warn "npm not found, skipping global npm packages"
 fi

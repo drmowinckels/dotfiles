@@ -70,8 +70,8 @@ check_submodule_updates() {
         if [ -d "$DOTFILES/$submodule_path/.git" ] || [ -f "$DOTFILES/$submodule_path/.git" ]; then
             cd "$DOTFILES/$submodule_path"
             git fetch origin 2>/dev/null || true
-            LOCAL=$(git rev-parse HEAD 2>/dev/null)
-            REMOTE=$(git rev-parse origin/HEAD 2>/dev/null || git rev-parse origin/main 2>/dev/null || git rev-parse origin/master 2>/dev/null)
+            LOCAL=$(git rev-parse HEAD 2>/dev/null) || true
+            REMOTE=$(git rev-parse origin/HEAD 2>/dev/null || git rev-parse origin/main 2>/dev/null || git rev-parse origin/master 2>/dev/null) || true
             if [ -n "$LOCAL" ] && [ -n "$REMOTE" ] && [ "$LOCAL" != "$REMOTE" ]; then
                 BEHIND=$(git rev-list --count HEAD..origin/HEAD 2>/dev/null || git rev-list --count HEAD..origin/main 2>/dev/null || echo "?")
                 SUBMODULE_UPDATES="${SUBMODULE_UPDATES}\n  • $submodule_path ($BEHIND commits behind)"

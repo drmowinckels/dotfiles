@@ -61,15 +61,15 @@ done
 check_submodule_updates() {
     echo "Checking for submodule updates..."
     cd "$DOTFILES"
-    git submodule init 2>/dev/null
-    git submodule update --init 2>/dev/null
+    git submodule init 2>/dev/null || true
+    git submodule update --init 2>/dev/null || true
 
     SUBMODULE_UPDATES=""
     while IFS= read -r submodule_path; do
         [ -z "$submodule_path" ] && continue
         if [ -d "$DOTFILES/$submodule_path/.git" ] || [ -f "$DOTFILES/$submodule_path/.git" ]; then
             cd "$DOTFILES/$submodule_path"
-            git fetch origin 2>/dev/null
+            git fetch origin 2>/dev/null || true
             LOCAL=$(git rev-parse HEAD 2>/dev/null)
             REMOTE=$(git rev-parse origin/HEAD 2>/dev/null || git rev-parse origin/main 2>/dev/null || git rev-parse origin/master 2>/dev/null)
             if [ -n "$LOCAL" ] && [ -n "$REMOTE" ] && [ "$LOCAL" != "$REMOTE" ]; then

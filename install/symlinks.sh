@@ -44,6 +44,7 @@ if [ ! -d "$HOME/.config/opencode" ]; then
     mkdir -p "$HOME/.config/opencode"
 fi
 safe_symlink "$DOTFILES/config/opencode/opencode.json" "$HOME/.config/opencode/opencode.json"
+safe_symlink "$HOME/.claude/skills" "$HOME/.config/opencode/skills"
 
 if [ -n "$FREESURFER_HOME" ] && [ -d "$FREESURFER_HOME" ]; then
     sudo ln -sf "$DOTFILES/freesurfer_license.txt" "$FREESURFER_HOME/.license"

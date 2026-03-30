@@ -1,457 +1,747 @@
 ---
 name: hugo-site
-description: Hugo static site development patterns for R-Ladies websites with Bootstrap 5, npm-managed dependencies, and semantic CSS. Focus on R-Ladies organizational patterns and migration from Bootstrap 4.
+description: Hugo static site development best practices covering template architecture, asset pipelines (Hugo Pipes, Tailwind CSS, esbuild), multilingual content, performance, accessibility, and configuration patterns. Framework-agnostic guidance for building maintainable Hugo sites.
 license: CC-BY-4.0
 compatibility: opencode
 metadata:
   framework: hugo
-  css-framework: bootstrap-5
-  organization: r-ladies
+  min-version: "0.144.0"
 ---
 
-# Hugo Site Development - R-Ladies Patterns
+# Hugo Static Site Development
 
-Hugo development patterns specific to R-Ladies Global website infrastructure and organizational needs.
+Best practices for building and maintaining Hugo websites. Covers template architecture, asset pipelines, performance, accessibility, multilingual content, and configuration.
 
-## Project Structure
-
-Standard R-Ladies Hugo site layout:
+## Directory Structure
 
 ```
 site/
-├── archetypes/          # Content templates
-├── assets/
-│   ├── scss/            # Bootstrap 5 + custom styles
-│   └── js/              # JavaScript bundles
-├── content/             # Markdown content
-│   ├── directory/       # Chapter directory listings
-│   ├── events/          # Event pages
-│   └── blog/            # Blog posts
-├── data/                # Data files (chapters, events, metadata)
-├── layouts/
-│   ├── partials/        # Reusable components
-│   ├── shortcodes/      # Content shortcodes
-│   └── _default/        # Base templates
-├── static/              # Static assets (images, fonts)
-├── package.json         # npm dependencies
-├── package-lock.json
-└── config.yaml          # Hugo configuration
+├── archetypes/              # Content templates for `hugo new`
+├── assets/                  # Processed by Hugo Pipes (CSS, JS, images)
+│   ├── css/                 # Stylesheets (CSS, SCSS, or Tailwind)
+│   │   └── components/      # Component-scoped styles
+│   ├── js/                  # JavaScript source files
+│   └── scss/                # SCSS if using Sass
+├── config/
+│   ├── _default/            # Base config (hugo.yaml, params.yaml, menu.yaml, languages.yaml)
+│   ├── development/         # Dev overrides
+│   └── production/          # Production overrides
+├── content/                 # Markdown content (page bundles)
+├── data/                    # Supplemental data (JSON, YAML, TOML)
+├── i18n/                    # Translation strings per language
+├── layouts/                 # Project-level layout overrides
+├── static/                  # Copied as-is (favicon, robots.txt, fonts)
+└── themes/theme-name/
+    ├── assets/              # Theme assets (same structure as root)
+    ├── layouts/
+    │   ├── _default/        # baseof.html, list.html, single.html, terms.html
+    │   ├── partials/        # Reusable template fragments
+    │   │   ├── head/        # Meta, CSS, structured data
+    │   │   ├── footer/      # Footer, scripts
+    │   │   └── funcs/       # Pure-logic partials (return values, no HTML)
+    │   └── shortcodes/      # Content-invokable components
+    └── theme.toml           # Theme metadata
 ```
 
-## npm Dependency Management
+**Key rule**: Processable assets (CSS, JS, SCSS, images needing resize) go in `assets/`. Only files that need no processing go in `static/`.
 
-### Migration from CDN to npm
+## Template Architecture
 
-```json
-// Good: package.json with pinned versions
-{
-  "name": "rladies-site",
-  "private": true,
-  "dependencies": {
-    "@fortawesome/fontawesome-free": "^6.4.0",
-    "bootstrap": "^5.3.0",
-    "fullcalendar": "^6.1.0",
-    "@amcharts/amcharts5": "^5.3.0"
-  },
-  "scripts": {
-    "sync": "node scripts/sync-assets.js"
-  }
-}
+### Base Template and Blocks
 
-// Bad: No version control, CDN links in templates
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-<!-- Breaks when CDN is down, no version pinning -->
-```
-
-### Asset Sync Script Pattern
-
-```javascript
-// Good: scripts/sync-assets.js
-const fs = require('fs');
-const path = require('path');
-
-const syncAssets = () => {
-  // Copy from node_modules to static/
-  const assets = [
-    {
-      from: 'node_modules/bootstrap/dist/css/bootstrap.min.css',
-      to: 'static/css/bootstrap.min.css'
-    },
-    {
-      from: 'node_modules/@fortawesome/fontawesome-free/css/all.min.css',
-      to: 'static/css/fontawesome.min.css'
-    },
-    {
-      from: 'node_modules/@fortawesome/fontawesome-free/webfonts',
-      to: 'static/webfonts',
-      isDirectory: true
-    }
-  ];
-
-  assets.forEach(asset => {
-    const fromPath = path.join(__dirname, '..', asset.from);
-    const toPath = path.join(__dirname, '..', asset.to);
-    
-    if (asset.isDirectory) {
-      fs.cpSync(fromPath, toPath, { recursive: true });
-    } else {
-      fs.copyFileSync(fromPath, toPath);
-    }
-    
-    console.log(`✓ Synced ${asset.from}`);
-  });
-};
-
-syncAssets();
-
-// Bad: Manual copying without automation
-// Leads to version drift and missing updates
-```
-
-## Bootstrap 5 Migration Patterns
-
-### Navbar Updates
-
-```html
-<!-- Good: Bootstrap 5 navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <div class="container-fluid">
-    <button class="navbar-toggler" type="button" 
-            data-bs-toggle="collapse" 
-            data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="/about">About</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
-<!-- Bad: Bootstrap 4 data attributes (won't work in BS5) -->
-<nav class="navbar navbar-expand-lg">
-  <button data-toggle="collapse" data-target="#navbarNav">
-    <!-- data-toggle and data-target are BS4 syntax -->
-  </button>
-</nav>
-```
-
-### Utility Class Updates
-
-```html
-<!-- Good: Bootstrap 5 utilities -->
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h2 class="fw-bold text-primary">Title</h2>
-  <span class="badge bg-success">New</span>
-</div>
-
-<!-- Bad: Bootstrap 4 classes that changed -->
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h2 class="font-weight-bold text-primary">Title</h2>
-  <span class="badge badge-success">New</span>
-  <!-- font-weight-bold → fw-bold -->
-  <!-- badge-success → bg-success -->
-</div>
-```
-
-## R-Ladies Directory Patterns
-
-### Chapter Card Layout
-
-```html
-<!-- Good: Semantic card structure for chapters -->
-<div class="row g-4">
-  {{ range .Site.Data.chapters }}
-  <div class="col-12 col-md-6 col-lg-4">
-    <div class="card h-100 shadow-sm hover-lift">
-      <div class="card-body d-flex flex-column">
-        <h5 class="card-title">{{ .name }}</h5>
-        <p class="card-text text-muted">{{ .city }}, {{ .country }}</p>
-        
-        <div class="mt-auto pt-3">
-          {{ if .meetup_url }}
-          <a href="{{ .meetup_url }}" class="btn btn-sm btn-outline-primary me-2">
-            <i class="fab fa-meetup"></i> Meetup
-          </a>
-          {{ end }}
-          
-          {{ if .twitter }}
-          <a href="https://twitter.com/{{ .twitter }}" class="btn btn-sm btn-outline-info">
-            <i class="fab fa-twitter"></i> Twitter
-          </a>
-          {{ end }}
-        </div>
-      </div>
-    </div>
-  </div>
-  {{ end }}
-</div>
-
-<!-- Bad: Unstructured layout without semantic HTML -->
-<div>
-  {{ range .Site.Data.chapters }}
-  <div style="float:left; width:33%">
-    <p><b>{{ .name }}</b></p>
-    <a href="{{ .meetup_url }}">Meetup</a>
-    <!-- No semantic structure, inline styles, poor responsive -->
-  </div>
-  {{ end }}
-</div>
-```
-
-### Directory Filtering (JavaScript)
-
-```javascript
-// Good: Vanilla JS filtering without jQuery
-const filterDirectory = () => {
-  const searchInput = document.getElementById('chapter-search');
-  const countryFilter = document.getElementById('country-filter');
-  const cards = document.querySelectorAll('.chapter-card');
-  
-  const filterCards = () => {
-    const searchTerm = searchInput.value.toLowerCase();
-    const selectedCountry = countryFilter.value;
-    
-    cards.forEach(card => {
-      const name = card.dataset.name.toLowerCase();
-      const country = card.dataset.country;
-      
-      const matchesSearch = name.includes(searchTerm);
-      const matchesCountry = !selectedCountry || country === selectedCountry;
-      
-      card.style.display = (matchesSearch && matchesCountry) ? 'block' : 'none';
-    });
-  };
-  
-  searchInput.addEventListener('input', filterCards);
-  countryFilter.addEventListener('change', filterCards);
-};
-
-document.addEventListener('DOMContentLoaded', filterDirectory);
-
-// Bad: jQuery dependency for simple filtering
-$('#chapter-search').on('input', function() {
-  $('.chapter-card').each(function() {
-    // Unnecessary jQuery overhead
-  });
-});
-```
-
-## FullCalendar Integration
-
-### Event Feed Setup
-
-```javascript
-// Good: FullCalendar with timezone handling
-document.addEventListener('DOMContentLoaded', function() {
-  const calendarEl = document.getElementById('calendar');
-  
-  const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'dayGridMonth',
-    timeZone: 'UTC',  // Store all events in UTC
-    headerToolbar: {
-      left: 'prev,next today',
-      center: 'title',
-      right: 'dayGridMonth,timeGridWeek,listMonth'
-    },
-    events: '/events/feed.ics',  // iCal feed
-    eventDidMount: function(info) {
-      // Add Bootstrap tooltip for event details
-      new bootstrap.Tooltip(info.el, {
-        title: info.event.extendedProps.description,
-        placement: 'top',
-        trigger: 'hover',
-        container: 'body'
-      });
-    }
-  });
-  
-  calendar.render();
-});
-
-// Bad: No timezone handling, missing user experience features
-new FullCalendar.Calendar(document.getElementById('calendar'), {
-  events: '/events.json'
-  // Missing timezone, poor UX, no tooltips
-}).render();
-```
-
-### iCal Feed Generation (Hugo)
+`baseof.html` defines the HTML shell. Child templates override blocks via `define`:
 
 ```go-html-template
-<!-- Good: layouts/_default/list.ics.html -->
-BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//R-Ladies Global//Events//EN
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-{{ range where .Site.RegularPages "Section" "events" }}
-BEGIN:VEVENT
-UID:{{ .File.UniqueID }}@rladies.org
-DTSTAMP:{{ .Date.Format "20060102T150405Z" }}
-DTSTART:{{ .Params.event_date | time.Format "20060102T150405Z" }}
-DTEND:{{ .Params.event_end | time.Format "20060102T150405Z" }}
-SUMMARY:{{ .Title }}
-DESCRIPTION:{{ .Summary | plainify }}
-LOCATION:{{ .Params.location | default "Online" }}
-URL:{{ .Permalink }}
-END:VEVENT
-{{ end }}
-END:VCALENDAR
+{{/* baseof.html */}}
+<!DOCTYPE html>
+<html lang="{{ .Site.Language.Lang }}">
+  <head>
+    {{ partial "head/meta.html" . }}
+    {{ partial "head/css.html" . }}
+    {{ block "head" . }}{{ end }}
+  </head>
+  <body>
+    {{ partial "nav.html" . }}
+    <main id="main">
+      {{ block "main" . }}{{ end }}
+    </main>
+    {{ partial "footer/footer.html" . }}
+    {{ partial "footer/scripts.html" . }}
+    {{ block "footer" . }}{{ end }}
+  </body>
+</html>
 ```
 
-## Semantic CSS Architecture
+```go-html-template
+{{/* section-name/list.html */}}
+{{ define "head" }}
+  {{/* Section-specific CSS */}}
+{{ end }}
 
-### Component-Based Styles
+{{ define "main" }}
+  <h1>{{ .Title }}</h1>
+  {{ .Content }}
+  {{ range .Pages }}
+    {{ partial "card.html" . }}
+  {{ end }}
+{{ end }}
 
-```scss
-// Good: assets/scss/components/_chapter-card.scss
-.chapter-card {
-  transition: transform 0.2s ease-in-out;
-  
-  &:hover {
-    transform: translateY(-4px);
-  }
-  
-  .card-title {
-    color: var(--bs-primary);
-    font-weight: 600;
-  }
-  
-  .social-links {
-    display: flex;
-    gap: 0.5rem;
-    
-    .btn {
-      flex: 1;
-    }
+{{ define "footer" }}
+  {{/* Section-specific JS */}}
+{{ end }}
+```
+
+Rules:
+- Child templates using a base template must contain **only** `define` actions, whitespace, and comments
+- Always pass the dot (`.`) to blocks and partials
+- Provide default content in `block` so pages render before blocks are overridden
+
+### Partials
+
+Organize by concern, not alphabetically:
+
+```
+partials/
+├── head/          # <head> content: meta, CSS, structured data, analytics
+├── footer/        # Footer HTML and script loading
+├── home/          # Homepage section partials
+├── post/          # Blog post components (header, authors, dates)
+├── funcs/         # Logic-only partials that return values (no HTML output)
+└── nav.html       # Navigation
+```
+
+**Use `partialCached`** for partials whose output doesn't vary per page:
+
+```go-html-template
+{{/* Good: cached since nav is the same on every page */}}
+{{ partialCached "nav.html" . }}
+
+{{/* Good: cached per language */}}
+{{ partialCached "nav.html" . .Lang }}
+
+{{/* Only use plain partial when output varies per page */}}
+{{ partial "post/header.html" . }}
+```
+
+**Function partials** return values without side effects:
+
+```go-html-template
+{{/* partials/funcs/social-url.html */}}
+{{ $urls := dict
+  "github"   (printf "https://github.com/%s" .handle)
+  "mastodon" .handle
+  "bluesky"  (printf "https://bsky.app/profile/%s" .handle)
+}}
+{{ return index $urls .type }}
+```
+
+### Template Lookup Order
+
+Hugo selects templates from most specific to most general: section type > page kind > default. Create section-specific templates (`layouts/blog/single.html`) to override defaults without conditionals.
+
+### Nil-Safe Access
+
+```go-html-template
+{{/* Good: nil-safe with `with` */}}
+{{ with .Params.author }}
+  <span>{{ . }}</span>
+{{ end }}
+
+{{/* Good: provide a default */}}
+{{ .Params.description | default .Site.Params.description }}
+
+{{/* Bad: will error if .Params.author is nil */}}
+{{ if .Params.author }}{{ .Params.author }}{{ end }}
+```
+
+## Asset Pipeline (Hugo Pipes)
+
+### CSS
+
+```go-html-template
+{{/* SCSS → CSS → minify → fingerprint */}}
+{{ $css := resources.Get "scss/main.scss" | toCSS | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+```
+
+### Tailwind CSS (v4+)
+
+Two approaches:
+
+**1. Native Hugo function** (Hugo 0.154.5+):
+```go-html-template
+{{ $css := resources.Get "css/main.css" | css.TailwindCSS | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+```
+
+Requires in `hugo.yaml`:
+```yaml
+build:
+  buildStats:
+    enable: true
+```
+
+**2. Pre-built via npm** (for complex setups with plugins):
+```json
+{
+  "scripts": {
+    "build:css": "npx @tailwindcss/cli -i assets/css/main.css -o assets/css/vendor/tailwind.css --minify"
   }
 }
+```
+Then load the pre-built file via `resources.Get "css/vendor/tailwind.css"` and pipe through Hugo for fingerprinting.
 
-// Bad: Utility-only approach or inline styles
-.blue-card { color: blue; }
-.mr-10 { margin-right: 10px; }
-<!-- Over-reliance on utilities, no component structure -->
+### Tailwind CSS Architecture
+
+Use CSS-first configuration with `@theme` for design tokens:
+
+```css
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #881ef9;
+  --color-primary-dark: #6b0fd4;
+  --font-sans: 'Poppins', sans-serif;
+  --radius-md: 1rem;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.06);
+}
 ```
 
-### SCSS Organization
+**Prefer semantic component classes** over raw utilities in templates:
 
-```scss
-// Good: assets/scss/main.scss structure
-// 1. Bootstrap customization
-@import "variables";  // Custom Bootstrap variables
-@import "~bootstrap/scss/bootstrap";
-
-// 2. Components
-@import "components/navbar";
-@import "components/chapter-card";
-@import "components/event-calendar";
-@import "components/footer";
-
-// 3. Layouts
-@import "layouts/directory";
-@import "layouts/blog";
-
-// 4. Utilities (minimal custom utilities)
-@import "utilities/hover-effects";
-
-// Bad: Single large CSS file or scattered styles
-// - Hard to maintain
-// - No clear organization
-// - Difficult to find components
+```css
+/* assets/css/components/cards.css */
+@layer components {
+  .card {
+    @apply bg-raised rounded-md shadow-card transition-shadow;
+  }
+  .card-hover:hover {
+    @apply shadow-card-hover;
+  }
+}
 ```
 
-## Data File Patterns
+```go-html-template
+{{/* Good: semantic classes */}}
+<div class="card card-hover">
 
-### Chapter Data Structure
+{{/* Acceptable: layout-only utilities that don't warrant a class */}}
+<div class="max-w-3xl mx-auto">
+
+{{/* Bad: long utility strings that obscure intent */}}
+<div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-200">
+```
+
+Organize components in separate files and import from main entry:
+
+```css
+/* main.css */
+@import "tailwindcss";
+@import "./components/layout.css";
+@import "./components/nav.css";
+@import "./components/cards.css";
+@import "./components/buttons.css";
+@import "./components/typography.css";
+```
+
+### Dark Mode via CSS Custom Properties
+
+Override design tokens on a `.dark` class — components automatically adapt:
+
+```css
+@custom-variant dark (&:where(.dark, .dark *));
+
+.dark {
+  --color-primary: #bb86f7;
+  --color-bg: #121220;
+  --color-surface: #1a1a2e;
+  --color-dark: #ededf4;
+  color-scheme: dark;
+}
+```
+
+Load the dark mode script inline in `<head>` to prevent flash of wrong theme:
+
+```go-html-template
+{{ $darkmode := resources.Get "js/darkmode.js" | minify }}
+<script>{{ $darkmode.Content | safeJS }}</script>
+```
+
+### JavaScript
+
+**Hugo's `js.Build`** (uses esbuild internally):
+
+```go-html-template
+{{ $js := resources.Get "js/main.js"
+  | js.Build (dict "minify" hugo.IsProduction "target" "es2020")
+  | fingerprint }}
+<script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+```
+
+**Bundling multiple files**:
+
+```go-html-template
+{{ $js := slice
+  (resources.Get "js/counter.js")
+  (resources.Get "js/scroll-reveal.js")
+  | resources.Concat "bundle.js"
+  | minify
+  | fingerprint }}
+<script src="{{ $js.RelPermalink }}" defer></script>
+```
+
+**For complex bundles** (libraries with many imports like FullCalendar, D3), pre-bundle with esbuild via npm:
+
+```json
+{
+  "scripts": {
+    "build:calendar": "npx esbuild assets/js/_calendar.entry.js --bundle --minify --outfile=assets/js/vendor/calendar.bundle.min.js"
+  }
+}
+```
+
+Then load the pre-built bundle through Hugo Pipes for fingerprinting only.
+
+### npm Integration
+
+```json
+{
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf assets/js/vendor assets/css/vendor",
+    "setup": "mkdir -p assets/js/vendor assets/css/vendor",
+    "build": "npm run clean && npm run setup && npm run build:css && npm run build:js && npm run sync:deps",
+    "postinstall": "npm run build"
+  }
+}
+```
+
+Key principles:
+- `postinstall` ensures assets are ready after `npm install`
+- Vendor outputs go to `assets/*/vendor/` (gitignored, rebuilt from source)
+- Copy only needed files from `node_modules/` (fonts, pre-built JS)
+- Never commit `node_modules/`
+
+### Resource Concatenation and Fingerprinting
+
+```go-html-template
+{{/* Concatenate multiple CSS files, then minify and fingerprint once */}}
+{{ $tw := resources.Get "css/vendor/tailwind.css" }}
+{{ $custom := resources.Get "css/custom.css" }}
+{{ $css := slice $tw $custom
+  | resources.Concat "bundle.min.css"
+  | minify
+  | fingerprint }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+```
+
+Always use `.Data.Integrity` for Subresource Integrity on production assets.
+
+## Performance
+
+### Font Loading
+
+```go-html-template
+{{/* Preload critical font weights only */}}
+<link rel="preload" href="{{ "/webfonts/main-400.woff2" | relURL }}"
+      as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ "/webfonts/main-600.woff2" | relURL }}"
+      as="font" type="font/woff2" crossorigin>
+```
+
+```css
+@font-face {
+  font-family: 'Main';
+  src: url('/webfonts/main-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+```
+
+- Self-host fonts (npm packages like `@fontsource/*`)
+- Use `font-display: swap` to prevent invisible text
+- Preload only the 1-2 most critical weights
+- Use woff2 format exclusively (universal browser support)
+
+### Image Optimization
+
+```go-html-template
+{{ with .Resources.GetMatch "featured.*" }}
+  {{ $small := .Resize "480x webp" }}
+  {{ $medium := .Resize "960x webp" }}
+  {{ $large := .Resize "1440x webp" }}
+  <img src="{{ $medium.RelPermalink }}"
+       srcset="{{ $small.RelPermalink }} 480w,
+               {{ $medium.RelPermalink }} 960w,
+               {{ $large.RelPermalink }} 1440w"
+       sizes="(max-width: 480px) 480px, (max-width: 960px) 960px, 1440px"
+       width="{{ .Width }}" height="{{ .Height }}"
+       loading="lazy"
+       alt="{{ $.Params.imageAlt | default $.Title }}">
+{{ end }}
+```
+
+- Always set `width` and `height` to prevent layout shifts
+- Use `loading="lazy"` on all images except hero/LCP
+- Convert to WebP via Hugo's image processing
+- Enable goldmark lazy loading for markdown images: `markup.goldmark.renderer.lazyLoadImages: true`
+
+### Non-Critical CSS
+
+Defer non-essential CSS (e.g., icon fonts):
+
+```go-html-template
+{{ $fa := resources.Get "scss/fontawesome.scss" | toCSS | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $fa.RelPermalink }}"
+      media="print" onload="this.media='screen'">
+<noscript><link rel="stylesheet" href="{{ $fa.RelPermalink }}"></noscript>
+```
+
+### HTML Minification
 
 ```yaml
-# Good: data/chapters/oslo.yaml
-name: "R-Ladies Oslo"
-city: "Oslo"
-country: "Norway"
-region: "Europe"
-status: "active"
-founded: "2018-03-15"
-
-social:
-  meetup: "rladies-oslo"
-  twitter: "RLadiesOslo"
-  github: "rladies-oslo"
-  email: "oslo@rladies.org"
-
-coordinates:
-  lat: 59.9139
-  lon: 10.7522
-
-organizers:
-  - name: "Organizer Name"
-    role: "Lead"
-
-# Bad: Inconsistent structure across chapters
-name: "R-Ladies Oslo"
-meetup_url: "https://meetup.com/rladies-oslo"  # Full URL instead of handle
-twitter: "@RLadiesOslo"  # Includes @ symbol inconsistently
-# Missing standardized fields
+# hugo.yaml
+minify:
+  minifyOutput: true
 ```
 
-## Responsive Layout Patterns
+Also build with `hugo --minify` in production.
 
-```html
-<!-- Good: Mobile-first responsive grid -->
-<div class="container">
-  <div class="row gy-4">
-    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-      <!-- Card content -->
-    </div>
-  </div>
-</div>
+## Accessibility
 
-<!-- With responsive utilities -->
-<nav class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center">
-  <!-- Vertical on mobile, horizontal on desktop -->
-</nav>
+### Semantic HTML
 
-<!-- Bad: Fixed widths or desktop-first -->
-<div style="width: 300px">
-  <!-- Breaks on mobile -->
-</div>
+```go-html-template
+<a href="#main" class="skip-link">Skip to main content</a>
+<nav aria-label="Main navigation">...</nav>
+<main id="main">
+  <article>
+    <h1>{{ .Title }}</h1>
+    {{ .Content }}
+  </article>
+</main>
+<aside aria-label="Table of contents">...</aside>
+<footer>...</footer>
 ```
 
-## Works Well With
+- One `<h1>` per page, proper heading hierarchy
+- Use `<button>` for actions, `<a>` for navigation
+- Skip-to-content link as first focusable element
+- `aria-label` on `<nav>` when there are multiple navs
+- `aria-hidden="true"` on decorative icons
 
-- `brand-yml` (Posit) - Apply consistent branding using brand.yml files for Quarto/Shiny integration
-- `r-package` - When building Hugo sites for R package documentation
+### Focus and Keyboard
 
-## When to Use Me
+```css
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+```
 
-Use this skill when:
-- Working on R-Ladies Global website or chapter sites
-- Migrating Hugo sites from Bootstrap 4 to Bootstrap 5
-- Setting up npm-based asset management for Hugo
-- Implementing directory/calendar features for community organizations
-- Need patterns for event feeds and chapter management
+- All interactive elements must be keyboard-accessible
+- Visible focus indicators on `:focus-visible`
+- Respect `prefers-reduced-motion`:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+### External Links
+
+Use a render hook to automatically handle external links:
+
+```go-html-template
+{{/* layouts/_markup/render-link.html */}}
+<a href="{{ .Destination | safeURL }}"
+  {{- if strings.HasPrefix .Destination "http" }} target="_blank" rel="noopener noreferrer"{{ end }}
+  {{- with .Title }} title="{{ . }}"{{ end }}>
+  {{- .Text | safeHTML -}}
+</a>
+```
+
+### Images
+
+```go-html-template
+{{/* Always require alt text */}}
+<img src="{{ .RelPermalink }}" alt="{{ .Params.alt | default .Title }}"
+     width="{{ .Width }}" height="{{ .Height }}">
+
+{{/* Decorative images */}}
+<img src="decorative.svg" alt="" aria-hidden="true">
+```
+
+## SEO and Structured Data
+
+### Meta Tags
+
+```go-html-template
+{{ $desc := .Description | default .Site.Params.description }}
+{{ $title := .Title | plainify }}
+{{ $siteTitle := .Site.Title | plainify }}
+
+<title>{{ cond (eq $title $siteTitle) $title (printf "%s - %s" $title $siteTitle) }}</title>
+<meta name="description" content="{{ $desc }}">
+<link rel="canonical" href="{{ .Permalink }}">
+
+{{/* Open Graph */}}
+<meta property="og:title" content="{{ $title }}">
+<meta property="og:description" content="{{ $desc }}">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:type" content="{{ cond .IsPage "article" "website" }}">
+
+{{/* Twitter Card */}}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ $title }}">
+<meta name="twitter:description" content="{{ $desc }}">
+```
+
+### Hreflang for Multilingual
+
+```go-html-template
+{{ if hugo.IsMultilingual }}
+  {{ range .AllTranslations }}
+    <link rel="alternate" hreflang="{{ .Lang }}" href="{{ .Permalink }}">
+  {{ end }}
+  <link rel="alternate" hreflang="x-default" href="{{ .Permalink }}">
+{{ end }}
+```
+
+### JSON-LD Structured Data
+
+```go-html-template
+{{ if .IsHome }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "{{ .Site.Title }}",
+  "url": "{{ .Site.BaseURL }}",
+  "logo": "{{ "images/logo.svg" | absURL }}"
+}
+</script>
+{{ end }}
+```
+
+### RSS
+
+Enable RSS for sections with regular content:
+
+```yaml
+outputs:
+  home: [HTML, RSS]
+  section: [HTML, RSS]
+  page: [HTML]
+```
+
+### Robots and Sitemap
+
+```yaml
+enableRobotsTXT: true
+```
+
+Hugo auto-generates `sitemap.xml`. Submit it to search engines.
+
+## Multilingual
+
+### Configuration
+
+```yaml
+# config/_default/languages.yaml
+en:
+  params:
+    languageName: "English"
+    weight: 1
+fr:
+  params:
+    languageName: "Français"
+    weight: 2
+```
+
+### Content Organization (filename-based)
+
+```
+content/
+  about/
+    _index.en.md
+    _index.fr.md
+  blog/
+    my-post/
+      index.en.md
+      index.fr.md
+      featured.jpg    # Shared across translations
+```
+
+Pages are linked automatically by shared base filename.
+
+### Translation Strings
+
+```yaml
+# i18n/en.yaml
+read_more:
+  other: "Read more"
+# i18n/fr.yaml
+read_more:
+  other: "Lire la suite"
+```
+
+```go-html-template
+{{ i18n "read_more" | default "Read more" }}
+```
+
+### URL Construction
+
+```go-html-template
+{{/* Good: language-aware URL helpers */}}
+<a href="{{ "about/" | relLangURL }}">
+<a href="{{ .RelPermalink }}">
+
+{{/* Bad: hardcoded paths break in non-default languages */}}
+<a href="/about/">
+```
+
+**Never construct URLs manually.** Always use `.Permalink`, `.RelPermalink`, `relLangURL`, or `absLangURL`.
+
+Run `hugo --printI18nWarnings` during development to find missing translations.
+
+## Configuration
+
+### Directory-Based Config
+
+```
+config/
+  _default/        # Always loaded
+    hugo.yaml      # Core: title, theme, outputs, build
+    params.yaml    # Site parameters
+    menu.yaml      # Navigation menus
+    languages.yaml # Language definitions
+    markup.yaml    # Markdown rendering options
+  development/
+    hugo.yaml      # Dev: buildDrafts: true, no minify
+  production/
+    hugo.yaml      # Prod: minify, analytics
+```
+
+Select environment: `hugo --environment production`
+
+### Essential Settings
+
+```yaml
+# config/_default/hugo.yaml
+enableRobotsTXT: true
+enableGitInfo: true
+
+buildDrafts: false       # Override in development only
+buildFuture: false       # Override if needed
+
+minify:
+  minifyOutput: true
+
+markup:
+  goldmark:
+    renderer:
+      lazyLoadImages: true
+
+taxonomies:
+  category: categories
+  tag: tags
+```
+
+### Environment-Conditional Logic
+
+```go-html-template
+{{ if hugo.IsProduction }}
+  {{/* Analytics, minified assets, etc. */}}
+{{ end }}
+```
+
+## Content Patterns
+
+### Page Bundles
+
+Co-locate content with its resources:
+
+```
+content/blog/my-post/
+  index.md           # The page
+  featured.jpg       # Accessible via .Resources
+  diagram.svg
+```
+
+Access in templates: `{{ .Resources.GetMatch "featured.*" }}`
+
+### Front Matter Conventions
+
+```yaml
+---
+title: "Post Title"
+date: 2026-03-14
+description: "100-160 char description for SEO"
+draft: false
+tags: ["tag1", "tag2"]
+image: featured.jpg
+---
+```
+
+### Archetypes
+
+```yaml
+# archetypes/blog.md
+---
+title: "{{ replace .File.ContentBaseName "-" " " | title }}"
+date: {{ .Date }}
+draft: true
+description: ""
+tags: []
+---
+```
+
+## Remote Data
+
+```go-html-template
+{{ with try (resources.GetRemote "https://api.example.com/data.json") }}
+  {{ with .Err }}
+    {{ errorf "Remote fetch failed: %s" . }}
+  {{ else }}
+    {{ $data := .Value | transform.Unmarshal }}
+    {{/* use $data */}}
+  {{ end }}
+{{ end }}
+```
+
+Hugo caches remote resources. For build resilience, consider fallback data files in `data/`.
+
+## Anti-Patterns
+
+| Don't | Do Instead |
+|-------|-----------|
+| Put processable assets in `static/` | Use `assets/` for anything Hugo Pipes should touch |
+| Hardcode URLs (`/path/to/page`) | Use `.Permalink`, `relLangURL`, `absURL` |
+| Use `.Page.URL` (deprecated) | Use `.Permalink` or `.RelPermalink` |
+| Inline large `<script>` blocks in templates | Extract to `assets/js/` and bundle via Hugo Pipes |
+| Use `var` in JavaScript | Use `const`/`let` (esbuild handles transpilation) |
+| Load external scripts without SRI | Add `integrity` attribute or self-host |
+| Skip `width`/`height` on images | Always set dimensions to prevent layout shifts |
+| Use `readDir`/`readFile` in themes | Breaks portability; use data files or page resources |
+| Commit `node_modules/` or vendor output | Gitignore and rebuild via `postinstall` |
+| Set `buildDrafts: true` in default config | Override in `config/development/hugo.yaml` only |
+
+## When to Use This Skill
+
+Use when:
+- Building or maintaining any Hugo static site
+- Setting up Hugo asset pipelines (CSS, JS, fonts)
+- Implementing multilingual Hugo sites
+- Optimizing Hugo site performance
+- Structuring Hugo templates and partials
+- Integrating npm dependencies with Hugo
 
 **Do NOT use for:**
-- General Hugo basics (covered in Hugo documentation)
-- Quarto sites (use Posit `brand-yml` skill instead)
-- Non-community organization sites
-
-## Quick Reference
-
-**npm workflow:** `npm install` → `npm run sync` → Hugo build
-
-**Bootstrap 5 key changes:**
-- `data-toggle` → `data-bs-toggle`
-- `font-weight-bold` → `fw-bold`
-- `badge-*` → `bg-*`
-- `ml-*/mr-*` → `ms-*/me-*`
-
-**R-Ladies patterns:**
-- Card-based directory layouts
-- FullCalendar with iCal feeds
-- Semantic component structure
-- Vanilla JS for interactivity
+- Quarto sites (use Posit skills instead)
+- Non-Hugo static site generators (Eleventy, Astro, etc.)

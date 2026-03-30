@@ -15,3 +15,7 @@ config/claude/plugins/
 config/claude/tasks/
 config/claude/backups/
 config/claude/ide/
+config/claude/sessions/
+config/claude/usage-data/
+config/claude/.credentials.json
+config/claude/.mcp.json

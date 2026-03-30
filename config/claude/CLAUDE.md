@@ -9,6 +9,22 @@
 - R: maintain DESCRIPTION and NEWS.md when changing package infrastructure
 - R: use r-lib/actions for GitHub Actions workflows
 - Hugo: semantic CSS classes, minimal JS, npm-based workflows
+- When the user reports a visual bug (colors, contrast, dark mode), trust their assessment — investigate the actual CSS/SCSS values, never dismiss as an illusion
+
+# Hugo Development
+
+- Always run `hugo server` or `hugo build` after making styling/layout changes to verify nothing is broken before moving on
+
+# R Package Development
+
+- Use roxygen2-level approaches (not Rd-based), prefer cli over cat/message
+- Never delete test files or vignette sections without explicit user approval
+
+# Git Workflow
+
+- Create a branch rather than reverting changes unless explicitly asked to revert
+- Pull and resolve conflicts before pushing when behind origin
+- When PR reviews contain GitHub code suggestions (```suggestion blocks), do NOT reimplement them locally — tell the user which suggestions to accept/reject on GitHub so the reviewer gets proper attribution
 
 # ast-grep with R support
 

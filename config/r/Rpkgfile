@@ -1,0 +1,39 @@
+# Core development
+devtools
+usethis
+roxygen2
+testthat
+pak
+
+# Documentation
+knitr
+rmarkdown
+quarto
+pkgdown
+
+# Code quality
+lintr
+styler
+covr
+reprex
+
+# Testing
+vcr
+vdiffr
+
+# Data wrangling
+tidyverse
+janitor
+httr2
+
+# Environment
+renv
+blogdown
+
+# AI/LLM
+ellmer
+mcptools
+btw
+
+# Fun
+praise

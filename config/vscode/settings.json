@@ -35,7 +35,6 @@
   "window.zoomLevel": 1,
   "terminal.integrated.enableMultiLinePasteWarning": false,
   "r.alwaysUseActiveTerminal": true,
-  "r.lsp.debug": true,
   "r.plot.useHttpgd": true,
   "r.removeLeadingComments": true,
   "r.rmarkdown.knit.openOutputFile": true,
@@ -51,21 +50,13 @@
     "markdown",
     "yaml",
     "json"
-    // ...
   ],
-  "chatgpt.lang": "en",
   "github.copilot.enable": {
     "quarto": false,
     "*": true
   },
-  "codestream.serverUrl": "https://codestream-us1.service.newrelic.com",
   "files.associations": {
     "renv.lock": "json"
-  },
-  "yaml.schemas": {
-    "file:///Users/athanasm/.positron/extensions/continue.continue-1.2.8-darwin-arm64/config-yaml-schema.json": [
-      ".continue/**/*.yaml"
-    ]
   },
   "workbench.startupEditor": "readme",
   "files.autoGuessEncoding": true,
@@ -84,6 +75,8 @@
   "[github-actions-workflow]": {
     "editor.defaultFormatter": "redhat.vscode-yaml"
   },
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.inheritEnv": true,
   "terminal.integrated.shellIntegration.enabled": false,
   "terminal.integrated.suggest.enabled": false,
   "positron.assistant.toolDetails.enable": true,

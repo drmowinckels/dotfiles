@@ -1,6 +1,6 @@
 ---
 name: ggseg-ecosystem
-description: Development patterns and architecture for the ggseg brain visualization ecosystem.
+description: Development patterns and architecture for the ggsegverse brain visualization ecosystem.
 license: CC-BY-4.0
 compatibility: opencode
 metadata:
@@ -11,32 +11,36 @@ metadata:
 
 ## Package Overview
 
-The ggseg ecosystem provides R tools for brain atlas visualization:
+The **ggsegverse** (Gross Geometry Brain Segmentation Universe) provides R tools for brain atlas visualization. The GitHub organisation is `ggsegverse` and the r-universe is at `https://ggsegverse.r-universe.dev`.
 
 | Package | Purpose |
 |---------|---------|
 | `ggseg.formats` | Foundation: data structures, atlas classes, validation, FreeSurfer I/O |
 | `ggseg` | 2D visualization via ggplot2 extension |
 | `ggseg3d` | 3D visualization via Three.js/htmlwidgets |
-| `ggsegExtra` | Atlas creation utilities requiring FreeSurfer |
+| `ggseg.meshes` | Additional brain surface meshes (pial, white, sphere, smoothwm, orig, SUIT flatmap) |
+| `ggseg.extra` | Atlas creation pipelines requiring FreeSurfer |
 
 **Dependency hierarchy:**
 ```
-ggseg.formats (foundation)
-├── ggseg (2D) ─────────────► sf, ggplot2, vctrs
-├── ggseg3d (3D) ───────────► htmlwidgets, Three.js
-└── ggsegExtra (utilities)
+ggseg.formats (foundation) ─── ships: inflated mesh, SUIT 3D pial mesh
+├── ggseg (2D) ──────────────► sf, ggplot2, vctrs
+├── ggseg3d (3D) ────────────► htmlwidgets, Three.js
+│   └── Suggests: ggseg.meshes (pial, white, semi-inflated, sphere, smoothwm, orig, SUIT flat)
+├── ggseg.meshes (meshes) ──► no hard deps, data-only package
+└── ggseg.extra (utilities)
     └── Depends: ggseg.formats, ggseg3d, freesurfer, terra
 ```
 
 ## Design Philosophy
 
 - **Unified atlas format**: Single `brain_atlas` class supports both 2D and 3D rendering
-- **Type polymorphism**: Cortical, subcortical, and tract atlases share interface but differ in data storage
+- **Type polymorphism**: Cortical, subcortical, cerebellar, and tract atlases share interface but differ in data storage
 - **Tidyverse integration**: Pipe-friendly APIs, tibble-based data structures, dplyr verbs
 - **ggplot2 extension pattern**: Custom ggproto classes for geoms, layers, positions
 - **Validation-first**: Extensive input validation with informative cli error messages
 - **Legacy compatibility**: Deprecated formats still supported with warnings
+- **Mesh separation**: Brain meshes are split across packages by role — inflated in ggseg.formats (always needed), additional surfaces in ggseg.meshes (optional)
 
 ## Core Data Structures
 
@@ -47,7 +51,7 @@ The primary atlas class supporting 2D and 3D rendering:
 ```r
 brain_atlas(
   atlas = "dk",                    # atlas name (single string)
-  type = "cortical",               # "cortical", "subcortical", or "tract"
+  type = "cortical",               # "cortical", "subcortical", "cerebellar", or "tract"
   core = data.frame(               # required columns: hemi, region, label
     hemi = c("lh", "rh"),
     region = c("bankssts", "bankssts"),
@@ -64,7 +68,8 @@ brain_atlas(
 |------|-----------|----------|
 | cortical | `cortical_data()` | `sf` (2D geometry), `vertices` (list-column of 0-indexed integers) |
 | subcortical | `subcortical_data()` | `sf` (optional), `meshes` (list-column with vertices/faces data frames) |
-| tract | `tract_data()` | `sf` (optional), `meshes` (tube meshes with optional tangent metadata) |
+| cerebellar | `cerebellar_data()` | `sf` (flatmap geometry), `vertices` (0-indexed into SUIT mesh) |
+| tract | `tract_data()` | `sf` (optional), centerlines + tangents for tube mesh generation |
 
 **Design rationale:**
 - `core` separates metadata from rendering data
@@ -100,10 +105,26 @@ as_brain_atlas(ggseg_atlas)  # ggseg_atlas → brain_atlas
 
 ### Brain Meshes
 
-fsaverage5 resolution: 10,242 vertices, 20,480 faces per hemisphere
+**Mesh storage across packages:**
 
-Stored as named list with `{hemi}_{surface}` keys (e.g., `lh_inflated`, `rh_white`).
-Each mesh contains `vertices` (x, y, z data frame) and `faces` (i, j, k triangle indices).
+| Surface | Package | Resolution | Access function |
+|---------|---------|------------|-----------------|
+| inflated | `ggseg.formats` | 10,242v / 20,480f per hemi | `get_brain_mesh("lh", "inflated")` |
+| SUIT 3D pial | `ggseg.formats` | 30,013v / 57,665f | `get_cerebellar_mesh()` |
+| pial | `ggseg.meshes` | 10,242v / 20,480f per hemi | `get_cortical_mesh("lh", "pial")` |
+| white | `ggseg.meshes` | 10,242v / 20,480f per hemi | `get_cortical_mesh("lh", "white")` |
+| semi-inflated | `ggseg.meshes` | 10,242v / 20,480f per hemi | `get_cortical_mesh("lh", "semi-inflated")` |
+| sphere | `ggseg.meshes` | 10,242v / 20,480f per hemi | `get_cortical_mesh("lh", "sphere")` |
+| smoothwm | `ggseg.meshes` | 10,242v / 20,480f per hemi | `get_cortical_mesh("lh", "smoothwm")` |
+| orig | `ggseg.meshes` | 10,242v / 20,480f per hemi | `get_cortical_mesh("lh", "orig")` |
+| SUIT flatmap | `ggseg.meshes` | 28,935v / 56,588f | `get_cerebellar_flatmap()` |
+
+All cortical meshes are fsaverage5 resolution. Each mesh is a list with `vertices` (data.frame: x, y, z) and `faces` (data.frame: i, j, k).
+
+**Mesh resolution in ggseg3d** — `resolve_brain_mesh()` is the single entry point:
+- `"inflated"` → delegates to `ggseg.formats::get_brain_mesh()`
+- All other surfaces → delegates to `ggseg.meshes::get_cortical_mesh()` (Suggests dependency; informative error if not installed)
+- Custom meshes can be passed via `brain_meshes` argument
 
 ## Rendering Modes
 
@@ -128,13 +149,21 @@ Per-region mesh rendering:
 - Separate mesh per brain structure
 - `colorMode = "facecolor"` in Three.js
 - Marching cubes mesh generation from volumes
+- Mesh decimation via `Rvcg::vcgQEdecim()` (cortical meshes cannot be decimated)
+
+### 3D Cerebellar (ggseg3d)
+
+Vertex-based coloring on shared SUIT mesh:
+- Same pattern as cortical but with 0-based face indices (converted at render time)
+- Cap vertices (28,935–30,012) render as grey background
+- SUIT flatmap available in ggseg.meshes for 2D cerebellar visualization
 
 ### 3D Tract (ggseg3d)
 
 Orientation-based coloring on tube meshes:
 - RGB encoding: R=left-right, G=anterior-posterior, B=superior-inferior
 - `tangents_to_colors()` converts tangent vectors to colors
-- Centerline extraction from streamlines
+- Tube meshes generated at render time via parallel transport frames
 
 ## Coding Style
 
@@ -363,9 +392,22 @@ ggplot() +
 ```r
 library(ggseg3d)
 
-ggseg3d(atlas = dk, hemisphere = c("left", "right")) |>
+ggseg3d(atlas = dk(), hemisphere = c("left", "right")) |>
   pan_camera("left lateral") |>
   add_glassbrain("right", opacity = 0.1)
+```
+
+### Render on different surfaces
+
+```r
+library(ggseg3d)
+
+# Requires ggseg.meshes package
+ggseg3d(atlas = dk(), surface = "pial") |>
+  pan_camera("left lateral")
+
+ggseg3d(atlas = dk(), surface = "white") |>
+  pan_camera("left lateral")
 ```
 
 ### Add user data
@@ -382,31 +424,37 @@ ggplot(my_data) +
   scale_fill_viridis_c()
 
 # 3D
-ggseg3d(.data = my_data, atlas = dk, colour = "value")
+ggseg3d(.data = my_data, atlas = dk(), colour = "value")
 ```
 
 ### Create atlas from FreeSurfer
 
 ```r
-library(ggsegExtra)
+library(ggseg.extra)
 
 # Cortical from annotation
-atlas <- make_cortical_atlas(
+atlas <- create_cortical_atlas(
   annot = "aparc",
   subject = "fsaverage5",
-  subjects_dir = freesurfer::fs_dir()
+  subjects_dir = freesurfer::fs_subj_dir()
 )
 
 # Subcortical from volume
-atlas <- make_subcortical_atlas(
+atlas <- create_subcortical_atlas(
   volume = "aseg.mgz",
   color_lut = freesurfer::fs_lut()
 )
 
-# Tract from tractography
-atlas <- make_tract_atlas(
-  tracts_dir = "path/to/trk_files",
-  output_dir = "output"
+# Cerebellar from volume (SUIT-based)
+atlas <- create_cerebellar_from_volume(
+  parcellation = "cerebellar_atlas.nii.gz",
+  label_table = label_df
+)
+
+# Whole-brain from NIfTI volume
+atlas <- create_wholebrain_atlas(
+  parcellation = "atlas.nii.gz",
+  label_table = label_df
 )
 ```
 
@@ -426,25 +474,66 @@ if (is_brain_atlas(atlas)) {
 ggseg_atlas <- as_ggseg_atlas(brain_atlas)
 brain_atlas <- as_brain_atlas(ggseg_atlas)
 
-# Extract data for custom processing
-sf_data <- atlas_sf(atlas)
-vertices <- atlas_vertices(atlas)
-meshes <- atlas_meshes(atlas)
+# Convert legacy atlases
+atlas <- convert_legacy_brain_atlas(old_atlas)
 ```
+
+## Atlas Creation Pipelines (ggseg.extra)
+
+| Pipeline | Function | Input | Output |
+|----------|----------|-------|--------|
+| Cortical | `create_cortical_atlas()` | FreeSurfer `.annot` | vertex-indexed atlas |
+| Subcortical | `create_subcortical_atlas()` | Volume `.mgz`/`.nii` | per-region mesh atlas |
+| Cerebellar | `create_cerebellar_from_volume()` | NIfTI in MNI space | SUIT vertex-indexed atlas |
+| Tract | `create_tract_atlas()` | Tractography files | centerline-based atlas |
+| Whole-brain | `create_wholebrain_atlas()` | NIfTI volume | mixed cortical+subcortical |
+
+Key implementation details:
+- Subcortical meshes can be decimated via `Rvcg::vcgQEdecim()` (default 50%)
+- Cortical meshes CANNOT be decimated (shared vertex indices would break)
+- Whole-brain pipeline uses `mri_vol2surf` with `--projfrac-max 0 1 0.1` for 100% coverage
+- Cerebellar pipeline uses SUIT deformation fields for MNI→SUIT space transformation
+
+## Package Infrastructure
+
+All ggsegverse packages follow a consistent setup:
+
+**GitHub Actions (6 workflows):**
+- `R-CMD-check.yaml` — multi-platform matrix (macOS, Windows, Ubuntu x3)
+- `code-quality.yaml` — lintr + goodpractice with PR comments
+- `test-coverage.yaml` — covr with self-hosted coverage badge
+- `pkgdown.yaml` — site build + gh-pages deploy
+- `render-readme.yaml` — quarto-based README rendering
+- `rhub.yaml` — manual R-hub checks
+
+**pkgdown:** Uses `ggseg.docs` template package (`Config/Needs/website: ggsegverse/ggseg.docs`)
+
+**README pattern:** `README.Rmd` with `output: github_document`, badges block, install from r-universe, usage examples, citation, funding section.
 
 ## System Requirements
 
-**For atlas creation (ggsegExtra):**
-- FreeSurfer (annotation files, surface meshes, mri_convert)
-- ImageMagick (image processing for 2D geometry)
-- Chrome/Chromium (webshot rendering)
+**For atlas creation (ggseg.extra):**
+- FreeSurfer (annotation files, surface meshes, mri_convert, mri_vol2surf)
 - fsaverage5 template (shipped with FreeSurfer)
 
 **For visualization only:**
 - No external dependencies required
-- Pre-built atlases available via `install_ggseg_atlas()`
+- Pre-built atlases available through the ggsegverse r-universe
 
-**System check:**
-```r
-ggsegExtra::setup_sitrep()
-```
+**For mesh rebuilding (ggseg.meshes data-raw):**
+- FreeSurfer + `freesurferformats` R package (cortical surfaces)
+- `gifti` R package (SUIT flatmap)
+
+## CRAN Submission Order
+
+Packages must be submitted in dependency order. Packages within the same tier can be submitted in parallel.
+
+| Tier | Package(s) | Blocked by |
+|------|-----------|------------|
+| 1 | `ggseg.formats` | — |
+| 2 | `ggseg.meshes`, `ggseg.docs` | `ggseg.formats` (Suggests) |
+| 3 | `ggseg`, `ggseg3d` | `ggseg.formats` (Imports) |
+| 4 | `ggseg.extra` | `ggseg.formats` + `ggseg3d` (Imports) |
+| 5 | `ggsegverse` | all core packages (Imports) |
+
+Atlas packages (ggsegDKT, ggsegYeo2011, etc.) depend on `ggseg.formats` and can be submitted any time after Tier 1.

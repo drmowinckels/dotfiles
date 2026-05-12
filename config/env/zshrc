@@ -63,7 +63,6 @@ source $DOTFILES/config/env/exports.zsh
 source $DOTFILES/config/env/aliases.zsh
 source $DOTFILES/config/env/functions.zsh
 source $DOTFILES/config/env/lazy.zsh
-source $DOTFILES/config/env/dotfiles-update-check.zsh
 
 # You may need to manually set your language environment
 export LC_ALL=en_US.UTF-8
@@ -102,3 +101,5 @@ source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zs
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 export LDFLAGS="-L/opt/homebrew/opt/libxml2/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/libxml2/include"
+
+. "$HOME/.local/bin/env"

@@ -58,16 +58,20 @@ yarn-error.log*
 .Rproj.user/
 .Rhistory
 .RData
+CRAN-SUBMISSION
+cran-comments.md
+*.Rcheck/
+revdep/
+.Renviron
+Rplots.pdf
+.httr-oauth
+.quarto
+README.html
 
 # Hugo #
 ########
 /public
 /resources/_gen
-
-.Rproj.user
-.Rdata
-.httr-oauth
-.quarto
 
 # LMM #
 #######

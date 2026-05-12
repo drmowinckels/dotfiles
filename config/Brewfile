@@ -28,7 +28,9 @@ brew 'ast-grep'             # Structural code search
 brew 'pkg-config'           # Package configuration tool
 brew 'npm'                  # Node package manager
 brew 'hugo'                 # Static site generator
-brew 'air'                  # Live reload for Go apps
+brew 'air'                  # R code formatter
+brew 'prettier'             # Multi-language formatter
+brew 'shfmt'                # Shell script formatter
 brew 'opencode'             # AI-powered coding assistant
 
 # ==============================================================================

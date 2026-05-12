@@ -1,5 +1,4 @@
 {
-  "effortLevel": "medium",
   "env": {
     "R_LIBS_USER": "~/R/library",
     "GITHUB_PAT": "${GITHUB_PAT}"
@@ -46,11 +45,32 @@
       "Read(//tmp/**)",
       "Read(//private/tmp/**)",
       "Read(//usr/local/bin/**)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(Rscript -e 'devtools::test\\(\\)')",
+      "Bash(pdftotext /Users/athanasm/workspace/rladies/branding-materials/Branding-guidelines.pdf -)",
+      "Bash(sips -g pixelWidth -g pixelHeight /Users/athanasm/workspace/rladies/rladiesguide/content/branding/affinity-logo/img-01.png /Users/athanasm/workspace/rladies/rladiesguide/content/branding/affinity-logo/img-04.png)",
+      "Bash(sips --resampleWidth 1800 /Users/athanasm/workspace/rladies/rladiesguide/content/branding/affinity-logo/img-01.png --out /tmp/img-01-resized.png)",
+      "Bash(sips --resampleWidth 1800 /Users/athanasm/workspace/rladies/rladiesguide/content/branding/affinity-logo/img-04.png --out /tmp/img-04-resized.png)",
+      "Bash(sips -g pixelWidth -g pixelHeight /Users/athanasm/workspace/rladies/rladiesguide/content/branding/hex-logos/img-01.png)",
+      "Bash(mkdir -p /tmp/rladies-resized)",
+      "Bash(do convert:*)",
+      "Bash(Rscript -e 'devtools::document\\(\\)')",
+      "Bash(RENV_PROFILE=default Rscript -e ':*)",
+      "mcp__puppeteer__puppeteer_click",
+      "mcp__puppeteer__puppeteer_screenshot",
+      "mcp__puppeteer__puppeteer_evaluate",
+      "mcp__puppeteer__puppeteer_navigate",
+      "Bash(/opt/homebrew/bin/gh run *)",
+      "Bash(/opt/homebrew/bin/gh pr create --title 'Install Node 20 via tarball to fix bot image build' --body ' *)"
     ],
     "additionalDirectories": [
       "/tmp",
-      "/Users/athanasm/Downloads"
+      "/Users/athanasm/Downloads",
+      "/Users/athanasm/workspace/rladies/rladiesguide/content/branding",
+      "/Users/athanasm/workspace/ggseg/ggseg.formats/tests/testthat",
+      "/Users/athanasm/workspace/ggseg/ggseg3d/tests/testthat",
+      "/Users/athanasm/workspace/ggseg/ggseg.extra/R",
+      "/Users/athanasm/workspace/ggseg/atlases/ggsegShen/data-raw/shen268/shen268"
     ]
   },
   "hooks": {
@@ -63,6 +83,42 @@
             "command": "jq -r '.tool_input.file_path // .tool_response.filePath' | { read -r f; ext=\"${f##*.}\"; if echo \"$ext\" | grep -qE '^(html|scss|toml)$'; then dir=\"$f\"; while [ \"$dir\" != \"/\" ]; do dir=\"$(dirname \"$dir\")\"; if [ -f \"$dir/hugo.toml\" ] || [ -f \"$dir/config.toml\" ] || [ -f \"$dir/config/_default/hugo.toml\" ]; then cd \"$dir\" && hugo build --quiet 2>&1 | tail -5; exit $?; fi; done; fi; }",
             "timeout": 30,
             "statusMessage": "Verifying Hugo build..."
+          },
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath' | { read -r f; if echo \"$f\" | grep -qiE '\\.[rR]$'; then /opt/homebrew/bin/air format \"$f\" 2>&1; fi; }",
+            "timeout": 30,
+            "statusMessage": "Formatting R file with air..."
+          },
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath' | { read -r f; if echo \"$f\" | grep -qiE '\\.(ya?ml|json|css|scss|html|md|qmd)$'; then /opt/homebrew/bin/prettier --write \"$f\" 2>&1; fi; }",
+            "timeout": 30,
+            "statusMessage": "Formatting with prettier..."
+          },
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath' | { read -r f; if echo \"$f\" | grep -qiE '\\.(sh|bash|zsh)$'; then /opt/homebrew/bin/shfmt -w -i 2 \"$f\" 2>&1; fi; }",
+            "timeout": 30,
+            "statusMessage": "Formatting shell script with shfmt..."
+          },
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath' | { read -r f; if echo \"$f\" | grep -qE '\\.R$'; then Rscript -e \"lintr::lint('$f')\" 2>&1 | tail -20; fi; }",
+            "timeout": 30,
+            "statusMessage": "Linting R file..."
+          },
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath' | { read -r f; if echo \"$f\" | grep -qE '\\.R$'; then dir=\"$f\"; while [ \"$dir\" != \"/\" ]; do dir=\"$(dirname \"$dir\")\"; if [ -f \"$dir/DESCRIPTION\" ]; then cd \"$dir\" && Rscript -e 'devtools::test()' 2>&1 | tail -20; exit $?; fi; done; fi; }",
+            "timeout": 120,
+            "statusMessage": "Running R tests..."
+          },
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath' | { read -r f; if echo \"$f\" | grep -qE '\\.R$'; then dir=\"$f\"; while [ \"$dir\" != \"/\" ]; do dir=\"$(dirname \"$dir\")\"; if [ -f \"$dir/DESCRIPTION\" ]; then cd \"$dir\" && Rscript -e 'devtools::check()' 2>&1 | tail -30; exit $?; fi; done; fi; }",
+            "timeout": 600,
+            "statusMessage": "Running R CMD check..."
           }
         ]
       }
@@ -78,6 +134,7 @@
     "writing-voices@straight-talk": true,
     "posit-dev@posit-dev-skills": true
   },
+  "effortLevel": "medium",
   "fileExclusions": [
     ".Rproj.user/**",
     ".Rhistory",

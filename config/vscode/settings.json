@@ -2,7 +2,8 @@
   "editor.wordWrap": "bounded",
   "editor.fontLigatures": true,
   "[r]": {
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "interpreters.startupBehavior": "auto"
   },
   "[quarto]": {
     "editor.formatOnSave": true
@@ -60,7 +61,10 @@
   },
   "workbench.startupEditor": "readme",
   "files.autoGuessEncoding": true,
-  "interpreters.startupBehavior": "manual",
+  "[python]": {
+    "interpreters.startupBehavior": "disabled"
+  },
+  "positron.interpreters.defaultInterpreter": "r",
   "positron.assistant.enable": true,
   "workbench.keybindings.rstudioKeybindings": true,
   "redhat.telemetry.enabled": false,
@@ -92,5 +96,6 @@
   "terminal.integrated.env.linux": {
     "OPENCODE_CONFIG_DIR": "${env:HOME}/.dotfiles/opencode"
   },
-  "github.copilot.chat.customOAIModels": {}
+  "github.copilot.chat.customOAIModels": {},
+  "claudeCode.preferredLocation": "panel"
 }

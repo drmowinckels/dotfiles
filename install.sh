@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -e  # Exit on error
+set -e # Exit on error
 
 echo "================================"
 echo "Setting up your Mac..."
@@ -33,11 +33,15 @@ echo "Step 5: Workspace repositories"
 "$DOTFILES/install/workspace.sh"
 echo ""
 
-echo "Step 6: Applications (Positron, R, etc.)"
+echo "Step 6: Rust toolchain"
+"$DOTFILES/install/rust.sh"
+echo ""
+
+echo "Step 7: Applications (Positron, R, etc.)"
 "$DOTFILES/install/apps.sh"
 echo ""
 
-echo "Step 7: Claude Code plugins"
+echo "Step 8: Claude Code plugins"
 "$DOTFILES/install/claude.sh"
 echo ""
 

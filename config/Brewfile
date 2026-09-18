@@ -52,6 +52,18 @@ brew 'gdal'                 # Geospatial Data Abstraction Library
 brew 'geos'                 # Geometry Engine Open Source
 
 # ==============================================================================
+# R Source-Build Dependencies
+# ==============================================================================
+# Keg-only formulae here must also be listed in config/r/keg-only-formulae
+# so R picks up their headers and libraries.
+
+brew 'gettext'              # libintl.h, needed by Matrix and friends
+brew 'libomp'               # OpenMP runtime for packages compiled with -fopenmp
+brew 'icu4c'                # Unicode support for stringi and friends
+brew 'gcc'                  # gfortran for packages with Fortran sources
+brew 'xz'                   # liblzma, needed by several parsers
+
+# ==============================================================================
 # GUI Applications - Productivity
 # ==============================================================================
 

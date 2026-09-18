@@ -86,7 +86,7 @@ Run them individually if you only need specific components:
 │   ├── vscode/           # VSCode/Positron settings and extensions
 │   ├── claude/           # Claude Code settings, skills, and commands
 │   ├── opencode/         # OpenCode configuration
-│   ├── r/                # R package installation
+│   ├── r/                # R package installation and native build flags
 │   ├── Brewfile          # Homebrew packages
 │   └── .mackup.cfg       # Mackup settings sync
 ├── install/              # Modular installation scripts
@@ -165,6 +165,11 @@ If you're forking this repo and don't need these, you can safely remove or comme
 - `env/path.zsh` (FSL, FreeSurfer paths)
 
 ## Troubleshooting
+
+**R package fails to compile (missing header such as `libintl.h`)**: The header
+belongs to a keg-only Homebrew formula that is not on the default search path.
+Add the formula to `config/r/keg-only-formulae` and `config/Brewfile`; the flags
+in `config/r/Makevars` (symlinked to `~/.R/Makevars`) pick it up from there.
 
 **Installation fails on symlinks**: The scripts are idempotent and will backup existing files. Check for `.backup` files.
 

@@ -15,6 +15,17 @@ export OPENCODE_CONFIG_DIR="$HOME/.dotfiles/opencode"
 # R Studio
 export RSTUDIO_WHICH_R=/usr/local/bin/R
 
+# Keg-only Homebrew formulae for configure scripts that use pkg-config
+# (compiler flags for the same formulae live in config/r/Makevars)
+if [[ -n "$HOMEBREW_PREFIX" && -r "$DOTFILES/config/r/keg-only-formulae" ]]; then
+    for formula in ${(f)"$(sed -e 's/#.*//' "$DOTFILES/config/r/keg-only-formulae")"}; do
+        [[ -z "$formula" ]] && continue
+        pc_dir="$HOMEBREW_PREFIX/opt/$formula/lib/pkgconfig"
+        [[ -d "$pc_dir" ]] && export PKG_CONFIG_PATH="${PKG_CONFIG_PATH:+$PKG_CONFIG_PATH:}$pc_dir"
+    done
+    unset formula pc_dir
+fi
+
 # Fix for fork safety
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 

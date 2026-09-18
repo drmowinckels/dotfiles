@@ -31,6 +31,7 @@ test_symlink "$HOME/.gitconfig" "$HOME/.dotfiles/config/git/config" "Git config"
 test_symlink "$HOME/.gitignore" "$HOME/.dotfiles/config/git/ignore" "Git ignore" false
 test_symlink "$HOME/.mackup.cfg" "$HOME/.dotfiles/config/.mackup.cfg" "Mackup config" true
 test_symlink "$HOME/.Rprofile" "$HOME/.dotfiles/config/r/profile" "R profile" true
+test_symlink "$HOME/.R/Makevars" "$HOME/.dotfiles/config/r/Makevars" "R Makevars" false
 
 if [ -e "$HOME/.ssh/config" ]; then
   test_symlink "$HOME/.ssh/config" "$HOME/.dotfiles/config/ssh/config" "SSH config" true

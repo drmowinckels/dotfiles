@@ -7,7 +7,7 @@ DOTFILES="$HOME/.dotfiles"
 
 log_info "Setting up Homebrew..."
 
-if ! xcode-select --version >/dev/null 2>&1; then
+if ! xcode-select -p >/dev/null 2>&1; then
     log_info "Installing Xcode Command Line Tools..."
     sudo xcode-select --install
 fi

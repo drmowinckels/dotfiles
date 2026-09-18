@@ -1,0 +1,15 @@
+# Compiler flags for R packages built from source.
+# Keg-only Homebrew formulae are not on the default include/library search
+# paths, so their locations are resolved here from the formula list.
+
+ifeq ($(HOMEBREW_PREFIX),)
+HOMEBREW_PREFIX := $(shell brew --prefix 2>/dev/null)
+endif
+
+ifneq ($(HOMEBREW_PREFIX),)
+KEG_FORMULAE := $(shell sed -e 's/\#.*//' $(HOME)/.dotfiles/config/r/keg-only-formulae 2>/dev/null)
+KEG_PREFIXES := $(addprefix $(HOMEBREW_PREFIX)/opt/,$(KEG_FORMULAE))
+
+CPPFLAGS += $(addprefix -I,$(wildcard $(addsuffix /include,$(KEG_PREFIXES))))
+LDFLAGS += $(addprefix -L,$(wildcard $(addsuffix /lib,$(KEG_PREFIXES))))
+endif

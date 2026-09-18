@@ -1,0 +1,6 @@
+# Keg-only Homebrew formulae whose headers/libraries R packages need when
+# compiling from source. Read by config/r/Makevars (compiler flags) and
+# config/env/exports.zsh (PKG_CONFIG_PATH).
+gettext
+libomp
+icu4c

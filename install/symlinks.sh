@@ -17,6 +17,11 @@ if [ ! -d "$HOME/.ssh" ]; then
 fi
 safe_symlink "$DOTFILES/config/ssh/config" "$HOME/.ssh/config"
 
+if [ ! -d "$HOME/.R" ]; then
+  mkdir -p "$HOME/.R"
+fi
+safe_symlink "$DOTFILES/config/r/Makevars" "$HOME/.R/Makevars"
+
 safe_symlink "$DOTFILES/config/git/ignore" "$HOME/.gitignore"
 safe_symlink "$DOTFILES/config/git/config" "$HOME/.gitconfig"
 

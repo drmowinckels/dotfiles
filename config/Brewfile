@@ -31,6 +31,8 @@ brew 'hugo'                 # Static site generator
 brew 'air'                  # R code formatter
 brew 'prettier'             # Multi-language formatter
 brew 'shfmt'                # Shell script formatter
+brew 'vale'                 # Prose linter (Vale VSCode extension)
+brew 'panache'              # Markdown/Quarto/Rmd formatter & language server
 brew 'opencode'             # AI-powered coding assistant
 
 # ==============================================================================

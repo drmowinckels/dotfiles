@@ -2,6 +2,7 @@ alefragnani.project-manager
 bierner.color-info
 brunnerh.file-properties-viewer
 charliermarsh.ruff
+chrischinchilla.vale-vscode
 continue.continue
 eamodio.gitlens
 evgeniypeshkov.syntax-highlighter
@@ -12,6 +13,7 @@ grrrck.positron-plus-1-e
 gruntfuggly.todo-tree
 gvelasq.tomorrow-night-bright-r-classic
 johnpapa.vscode-peacock
+jolars.panache
 mechatroner.rainbow-csv
 mhutchie.git-graph
 mikestead.dotenv

@@ -31,6 +31,8 @@ brew 'hugo'                 # Static site generator
 brew 'air'                  # R code formatter
 brew 'prettier'             # Multi-language formatter
 brew 'shfmt'                # Shell script formatter
+brew 'vale'                 # Prose linter (Vale VSCode extension)
+brew 'panache'              # Markdown/Quarto/Rmd formatter & language server
 brew 'opencode'             # AI-powered coding assistant
 
 # ==============================================================================
@@ -70,6 +72,7 @@ brew 'xz'                   # liblzma, needed by several parsers
 cask 'google-chrome'        # Web browser
 cask 'dropbox'              # Cloud storage
 cask 'bitwarden'            # Password manager
+brew 'bitwarden-cli'        # Bitwarden CLI (bw) for env/secret loading
 cask '1password'            # Alternative password manager
 cask 'stretchly', args: { no_quarantine: true }  # Break reminder
 

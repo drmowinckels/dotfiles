@@ -1,10 +1,45 @@
 {
   "env": {
     "R_LIBS_USER": "~/R/library",
-    "GITHUB_PAT": "${GITHUB_PAT}"
+    "GITHUB_PAT": "${GITHUB_PAT}",
+    "IMPECCABLE_HOOK_DISABLED": "1"
   },
   "permissions": {
     "allow": [
+      "Edit(worker/src/slack-oauth.js)",
+      "Bash(sed:*)",
+      "Bash(cat:*)",
+      "Bash(echo:*)",
+      "Bash(printf:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(awk:*)",
+      "Bash(diff:*)",
+      "Bash(cd:*)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(cp:*)",
+      "Bash(ln:*)",
+      "Bash(touch:*)",
+      "Bash(tee:*)",
+      "Bash(tr:*)",
+      "Bash(cut:*)",
+      "Bash(uniq:*)",
+      "Bash(comm:*)",
+      "Bash(basename:*)",
+      "Bash(dirname:*)",
+      "Bash(test:*)",
+      "Bash(true:*)",
+      "Bash(date:*)",
+      "Bash(./node_modules/.bin/eslint:*)",
+      "Bash(./node_modules/.bin/prettier:*)",
+      "Bash(./node_modules/.bin/vitest:*)",
+      "Bash(./node_modules/.bin/stylelint:*)",
+      "Bash(./node_modules/.bin/tsc:*)",
+      "Bash(./node_modules/.bin/knip:*)",
+      "Bash(./node_modules/.bin/cspell:*)",
+      "Bash(actionlint:*)",
+      "Bash(stylelint:*)",
       "Bash(R:*)",
       "Bash(Rscript:*)",
       "Bash(/opt/homebrew/bin/Rscript:*)",
@@ -24,9 +59,6 @@
       "Bash(hugo:*)",
       "Bash(quarto:*)",
       "Bash(npm:*)",
-      "Bash(npx:*)",
-      "Bash(node:*)",
-      "Bash(python3:*)",
       "Bash(pip3:*)",
       "Bash(uv:*)",
       "Bash(brew:*)",
@@ -43,16 +75,15 @@
       "Bash(for:*)",
       "Bash(if:*)",
       "Bash(until:*)",
-      "Bash(zsh -c:*)",
       "WebFetch",
       "WebSearch",
-      "Read(//Users/athanasm/**)",
-      "Read(//Applications/**)",
-      "Read(//opt/homebrew/**)",
-      "Read(//Library/Frameworks/**)",
-      "Read(//tmp/**)",
-      "Read(//private/tmp/**)",
-      "Read(//usr/local/bin/**)",
+      "Read(/Users/athanasm/**)",
+      "Read(/Applications/**)",
+      "Read(/opt/homebrew/**)",
+      "Read(/Library/Frameworks/**)",
+      "Read(/tmp/**)",
+      "Read(/private/tmp/**)",
+      "Read(/usr/local/bin/**)",
       "Bash(done)",
       "Bash(do convert:*)",
       "Bash(air:*)",
@@ -62,10 +93,8 @@
       "mcp__puppeteer__puppeteer_evaluate",
       "mcp__puppeteer__puppeteer_navigate",
       "mcp__puppeteer__puppeteer_hover",
-      "Bash(xargs -0 perl -i -pe ' *)",
       "Bash(command -v air)",
-      "Bash(perl -i -pe ' *)",
-      "Read(//dev/**)",
+      "Read(/dev/**)",
       "Bash(cargo check:*)",
       "Bash(cargo build:*)",
       "Bash(cargo test:*)",
@@ -89,8 +118,61 @@
       "Bash(rustfmt:*)",
       "Bash(pkill -f \"target/debug/breakly\")",
       "Bash(pkill -f \"node.*tauri dev\")",
-      "Bash(git rebase *)",
-      "Bash(git push *)"
+      "Bash(git rebase:*)",
+      "Bash(git push:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git reflog:*)",
+      "Bash(git branch:*)",
+      "Bash(git merge:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(git reset:*)",
+      "Bash(git restore:*)",
+      "Bash(git rm:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git mergetool:*)",
+      "mcp__github__get_file_contents",
+      "mcp__github__get_issue",
+      "mcp__github__get_pull_request",
+      "mcp__github__get_pull_request_comments",
+      "mcp__github__get_pull_request_files",
+      "mcp__github__get_pull_request_reviews",
+      "mcp__github__get_pull_request_status",
+      "mcp__github__list_commits",
+      "mcp__github__list_issues",
+      "mcp__github__list_pull_requests",
+      "mcp__github__search_code",
+      "mcp__github__search_issues",
+      "mcp__github__search_repositories",
+      "mcp__github__search_users",
+      "Bash(cargo deny *)",
+      "Bash(cargo llvm-cov *)"
+    ],
+    "deny": [
+      "Read(/Users/athanasm/.ssh/**)",
+      "Read(/Users/athanasm/.aws/**)",
+      "Read(/Users/athanasm/.gnupg/**)",
+      "Read(/Users/athanasm/.config/gh/**)",
+      "Read(/Users/athanasm/Library/Keychains/**)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Edit(/Users/athanasm/.zshrc)",
+      "Edit(/Users/athanasm/.zshenv)",
+      "Edit(/Users/athanasm/.zprofile)",
+      "Edit(/Users/athanasm/Library/LaunchAgents/**)",
+      "Edit(/Users/athanasm/.ssh/**)",
+      "Read(/Users/athanasm/.claude.json)",
+      "Read(/Users/athanasm/.claude/ide/**)",
+      "Read(/Users/athanasm/.claude/.credentials.json)",
+      "Read(/Users/athanasm/.npmrc)",
+      "Read(/Users/athanasm/.config/op/**)",
+      "Read(/Users/athanasm/.kube/**)",
+      "Read(/Users/athanasm/.netrc)",
+      "Read(/Users/athanasm/.docker/config.json)",
+      "Edit(/Users/athanasm/.bashrc)",
+      "Edit(/Users/athanasm/.profile)"
     ],
     "additionalDirectories": [
       "/tmp",
@@ -113,7 +195,10 @@
       "/Users/athanasm/workspace/rladies/jinx-reusables-docs/.github/workflows",
       "/Users/athanasm/workspace/rladies/jinx-amend-pr58/R",
       "/Users/athanasm/workspace/rladies/rladiesguide-structure-checks/.github/workflows",
-      "/Users/athanasm/workspace/random"
+      "/Users/athanasm/workspace/random",
+      "/Users/athanasm/workspace/rladies/jinx-rag-r/tests/testthat",
+      "/Users/athanasm/workspace/rladies/jinx-rag-r/R",
+      "/Users/athanasm/workspace/ggseg/ggseg.formats/R"
     ]
   },
   "hooks": {
@@ -135,7 +220,7 @@
           },
           {
             "type": "command",
-            "command": "jq -r '.tool_input.file_path // .tool_response.filePath' | { read -r f; if echo \"$f\" | grep -qiE '\\.(ya?ml|json|css|scss|html|md|qmd)$'; then /opt/homebrew/bin/prettier --write \"$f\" 2>&1; fi; }",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath' | { read -r f; if echo \"$f\" | grep -qE '/(layouts|archetypes)/'; then exit 0; fi; if echo \"$f\" | grep -qiE '\\.(ya?ml|json|css|scss|html|md|qmd)$'; then /opt/homebrew/bin/prettier --write \"$f\" 2>&1; fi; }",
             "timeout": 30,
             "statusMessage": "Formatting with prettier..."
           },
@@ -144,6 +229,12 @@
             "command": "jq -r '.tool_input.file_path // .tool_response.filePath' | { read -r f; if echo \"$f\" | grep -qiE '\\.(sh|bash|zsh)$'; then /opt/homebrew/bin/shfmt -w -i 2 \"$f\" 2>&1; fi; }",
             "timeout": 30,
             "statusMessage": "Formatting shell script with shfmt..."
+          },
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath' | { read -r f; if echo \"$f\" | grep -qE '\\.rs$'; then dir=\"$f\"; while [ \"$dir\" != \"/\" ]; do dir=\"$(dirname \"$dir\")\"; if [ -f \"$dir/Cargo.toml\" ]; then cd \"$dir\" && cargo fmt -- \"$f\" 2>&1 | tail -10; exit $?; fi; done; fi; }",
+            "timeout": 30,
+            "statusMessage": "Formatting Rust file with cargo fmt..."
           },
           {
             "type": "command",
@@ -175,9 +266,111 @@
     "document-skills@anthropic-agent-skills": true,
     "example-skills@anthropic-agent-skills": true,
     "writing-voices@straight-talk": true,
-    "posit-dev@posit-dev-skills": true
+    "posit-dev@posit-dev-skills": true,
+    "skill-optimizer@claude-domain-skills": true,
+    "impeccable@impeccable": true,
+    "ui-ux-pro-max@ui-ux-pro-max-skill": true,
+    "ponytail@ponytail": true
+  },
+  "extraKnownMarketplaces": {
+    "posit-dev-skills": {
+      "source": {
+        "source": "github",
+        "repo": "posit-dev/skills"
+      }
+    },
+    "straight-talk": {
+      "source": {
+        "source": "github",
+        "repo": "drmowinckels/straight-talk"
+      }
+    },
+    "learning-opportunities": {
+      "source": {
+        "source": "github",
+        "repo": "DrCatHicks/learning-opportunities"
+      }
+    },
+    "github-pr-skills": {
+      "source": {
+        "source": "github",
+        "repo": "aidankinzett/claude-git-pr-skill"
+      }
+    },
+    "addy-web-quality-skills": {
+      "source": {
+        "source": "github",
+        "repo": "addyosmani/web-quality-skills"
+      }
+    },
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    },
+    "claude-domain-skills": {
+      "source": {
+        "source": "github",
+        "repo": "miles990/claude-domain-skills"
+      }
+    },
+    "cloudflare": {
+      "source": {
+        "source": "github",
+        "repo": "cloudflare/skills"
+      }
+    },
+    "impeccable": {
+      "source": {
+        "source": "github",
+        "repo": "pbakaus/impeccable"
+      }
+    },
+    "ui-ux-pro-max-skill": {
+      "source": {
+        "source": "github",
+        "repo": "nextlevelbuilder/ui-ux-pro-max-skill"
+      }
+    },
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
+      }
+    }
   },
   "effortLevel": "medium",
+  "tui": "fullscreen",
+  "autoMode": {
+    "environment": [
+      "### Org-wide",
+      "**Organization**: None configured",
+      "**Cloud provider(s)**: None configured",
+      "**Repository visibility**: PUBLIC — drmowinckels/dotfiles (github.com) is public; any push there is publishing",
+      "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
+      "**Secrets management**: Bitwarden CLI (`bw`, `bw-unlock`, `bw-env` seen in shell history) — used locally to populate secrets; not a shared org secrets service",
+      "**Default / protected branches**: main (default); Protected branches: none listed; Rulesets: none listed — repo appears unprotected per gh, not just unlisted (no rulesets found either)",
+      "**CI/CD deploy targets**: None configured",
+      "**Network posture**: None configured",
+      "**Host containment**: None configured — assume Claude Code runs on an ordinary developer machine or CI runner with open internet",
+      "**Source control**: The trusted repo (drmowinckels/dotfiles on github.com) and its remote(s) only (no additional orgs configured)",
+      "**Trusted internal domains**: None configured",
+      "**Trusted cloud buckets**: None configured",
+      "**Key internal services**: None configured",
+      "**Internal package registry**: None configured",
+      "**Sensitive data locations & audiences**: `.env`, `.env.local`, `config/claude/.credentials.json` and other gitignored credential files in this repo — treat as personal secrets, never commit or share; share only with audiences cleared at the [named+specifics] bar",
+      "**Data retention / declassification**: None configured",
+      "**Sensitive remote targets**: any namespace, host, or container whose name carries `prod` or `production` as a whole word or name segment",
+      "**Protected deployment namespaces / environments**: None configured — fall back to the Sensitive remote targets heuristic",
+      "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
+      "### User-specific",
+      "**Primary use of Claude Code**: personal dotfiles / macOS system configuration management (Hugo, R package tooling, shell/system config) — hobby/personal posture",
+      "**Trusted repo**: drmowinckels/dotfiles (github.com, public) — the working directory's own repo and remote; since it's public, only this repo's own work belongs in commits/pushes here, and secrets/PII are never cleared into it regardless of visibility",
+      "**Org-specific CLiCLIs**: None configured — macOS system tools used routinely (sysctl, launchctl, memory_pressure, plutil, security) are personal-machine utilities, not org CLIs",
+      "routine under drmowinckels/dotfiles prefix: git, gh, hugo, quarto, cargo, npm/npx operations scoped to this repo's own tooling"
+    ]
+  },
   "fileExclusions": [
     ".Rproj.user/**",
     ".Rhistory",

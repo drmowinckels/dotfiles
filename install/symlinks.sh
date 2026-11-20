@@ -17,6 +17,8 @@ if [ ! -d "$HOME/.ssh" ]; then
 fi
 safe_symlink "$DOTFILES/config/ssh/config" "$HOME/.ssh/config"
 
+safe_symlink "$DOTFILES/config/vale/vale.ini" "$HOME/.vale.ini"
+
 if [ ! -d "$HOME/.R" ]; then
   mkdir -p "$HOME/.R"
 fi

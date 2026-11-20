@@ -27,3 +27,7 @@ Run in the current R package directory.
 - If a NOTE is about package size or first submission, flag it but don't try to "fix" it
 - If unsure whether a change is safe, ask before making it
 - Do not commit unless the user asks
+
+## Works Well With
+
+- `r-release` — confirming the distribution channel and executing the actual release (tag/merge/publish/dev-bump) once this check passes

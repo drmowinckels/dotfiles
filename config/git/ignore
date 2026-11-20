@@ -59,14 +59,17 @@ yarn-error.log*
 .Rhistory
 .RData
 CRAN-SUBMISSION
-cran-comments.md
 *.Rcheck/
 revdep/
 .Renviron
 Rplots.pdf
 .httr-oauth
 .quarto
+
+# README #
+##########
 README.html
+README.pdf
 
 # Hugo #
 ########
@@ -76,4 +79,8 @@ README.html
 # LMM #
 #######
 .continue/
-.claude/
+.claude/*
+!.claude/settings.json
+!.claude/agents/
+!.claude/commands/
+.impeccable/

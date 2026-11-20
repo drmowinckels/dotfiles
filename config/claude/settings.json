@@ -150,6 +150,20 @@
       "Bash(cargo deny *)",
       "Bash(cargo llvm-cov *)"
     ],
+    "deny": [
+      "Read(/Users/athanasm/.ssh/**)",
+      "Read(/Users/athanasm/.aws/**)",
+      "Read(/Users/athanasm/.gnupg/**)",
+      "Read(/Users/athanasm/.config/gh/**)",
+      "Read(/Users/athanasm/Library/Keychains/**)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Edit(/Users/athanasm/.zshrc)",
+      "Edit(/Users/athanasm/.zshenv)",
+      "Edit(/Users/athanasm/.zprofile)",
+      "Edit(/Users/athanasm/Library/LaunchAgents/**)",
+      "Edit(/Users/athanasm/.ssh/**)"
+    ],
     "additionalDirectories": [
       "/tmp",
       "/Users/athanasm/Downloads",

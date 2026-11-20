@@ -45,6 +45,10 @@ echo "Step 8: Claude Code plugins"
 "$DOTFILES/install/claude.sh"
 echo ""
 
+echo "Step 9: Launchd agents"
+"$DOTFILES/install/launchd.sh"
+echo ""
+
 echo "================================"
 echo "Installation complete!"
 echo "================================"

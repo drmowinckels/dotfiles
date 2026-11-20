@@ -95,9 +95,11 @@ bw-env() {
     echo "bw: item '$item' not found (after sync)"
     return 1
   fi
-  local count
-  count=$(printf '%s' "$json" | python3 -c '
-import json, sys, shlex
+  local exports
+  # Field names are interpolated into the string eval runs below, so anything
+  # that is not a bare identifier is vault-controlled shell code: validate.
+  exports=$(printf '%s' "$json" | python3 -c '
+import json, re, sys, shlex
 item = json.load(sys.stdin)
 fields = item.get("fields") or []
 n = 0
@@ -106,11 +108,17 @@ for f in fields:
     value = f.get("value")
     if not name or value is None:
         continue
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
+        print(f"bw: skipping field {name!r}: not a valid variable name", file=sys.stderr)
+        continue
     print(f"export {name}={shlex.quote(value)}")
     n += 1
-print(f"# loaded {n}", file=sys.stderr)
-') || return 1
-  eval "$count"
+sys.exit(0 if n else 3)
+') || {
+    [[ $? -eq 3 ]] && echo "bw: item '$item' has no usable custom fields"
+    return 1
+  }
+  eval "$exports"
 }
 
 bw-env-list() {

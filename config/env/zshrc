@@ -62,6 +62,7 @@ source $DOTFILES/config/env/path.zsh
 source $DOTFILES/config/env/exports.zsh
 source $DOTFILES/config/env/aliases.zsh
 source $DOTFILES/config/env/functions.zsh
+source $DOTFILES/config/env/bitwarden.zsh
 source $DOTFILES/config/env/lazy.zsh
 
 # You may need to manually set your language environment

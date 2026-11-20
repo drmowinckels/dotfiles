@@ -72,6 +72,7 @@ brew 'xz'                   # liblzma, needed by several parsers
 cask 'google-chrome'        # Web browser
 cask 'dropbox'              # Cloud storage
 cask 'bitwarden'            # Password manager
+brew 'bitwarden-cli'        # Bitwarden CLI (bw) for env/secret loading
 cask '1password'            # Alternative password manager
 cask 'stretchly', args: { no_quarantine: true }  # Break reminder
 

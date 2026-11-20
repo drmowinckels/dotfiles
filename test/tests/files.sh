@@ -28,3 +28,19 @@ echo ""
 for envfile in aliases.zsh exports.zsh functions.zsh path.zsh zshrc lazy.zsh; do
     test_file "$HOME/.dotfiles/config/env/$envfile" "env/$envfile" "true"
 done
+
+echo ""
+echo "Testing Claude review system..."
+echo ""
+
+for agent in fresh-eyes-reviewer review-verifier; do
+    test_file "$HOME/.dotfiles/config/claude/agents/$agent.md" "claude/agents/$agent.md" "true"
+done
+
+for skill in pre-merge-review review-scaffold review-eval; do
+    test_file "$HOME/.dotfiles/config/claude/skills/$skill/SKILL.md" "claude/skills/$skill/SKILL.md" "true"
+done
+
+for tmpl in REVIEW.md RISK_TIERS.md ROLLBACK.md pull_request_template.md; do
+    test_file "$HOME/.dotfiles/config/claude/templates/review/$tmpl" "claude/templates/review/$tmpl" "true"
+done

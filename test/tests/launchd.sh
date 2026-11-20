@@ -61,26 +61,22 @@ sh -c 'while :; do :; done' &
 busy_pid=$!
 sleep 1
 
-out=$(reaper_fixture 'sleep 97')
-if echo "$out" | grep -q "would terminate:.*$idle_pid"; then
-  success "claude-reaper.sh selects an idle process"
-else
-  error "claude-reaper.sh did not select idle fixture $idle_pid"
-fi
+expect_reaper() {
+  if echo "$2" | grep -q "$3"; then
+    success "claude-reaper.sh $1"
+  else
+    error "claude-reaper.sh failed: $1 (expected /$3/)"
+  fi
+}
 
-out=$(reaper_fixture 'while :')
-if echo "$out" | grep -q "Skipping $busy_pid"; then
-  success "claude-reaper.sh spares a busy process"
-else
-  error "claude-reaper.sh did not spare busy fixture $busy_pid"
-fi
+# Both fixtures in one window, so this also proves the reaper discriminates
+# between an idle and a busy candidate within a single sampling pass.
+out=$(reaper_fixture 'sleep 97|while :')
+expect_reaper "selects an idle process" "$out" "would terminate:.*$idle_pid"
+expect_reaper "spares a busy process" "$out" "Skipping $busy_pid"
 
 out=$(reaper_fixture 'sleep 97' 3)
-if echo "$out" | grep -q "Nothing to reap"; then
-  success "claude-reaper.sh honours the age floor"
-else
-  error "claude-reaper.sh reaped below the age floor"
-fi
+expect_reaper "honours the age floor" "$out" "Nothing to reap"
 
 kill "$idle_pid" "$busy_pid" 2>/dev/null
 wait "$idle_pid" "$busy_pid" 2>/dev/null

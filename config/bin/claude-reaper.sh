@@ -6,19 +6,9 @@
 # parent it to a long-lived extension host. The host outlives the tab, so the
 # processes accumulate until they exhaust RAM and swap.
 #
-# A process is reaped only when it is BOTH older than MAX_AGE_DAYS and has
-# used less than CPU_BUDGET_PERCENT of one core across a sampling window.
-#
-# The budget is a threshold, not equality: an idle session still accrues a few
-# centiseconds per window from Node timers and file watchers, so testing for
-# an unchanged CPU counter classified every real process as busy and reaped
-# nothing. Total CPU time is used rather than utime, because a process
-# spinning in syscalls accrues stime and reads as idle on utime alone.
-#
-# shortcut: CPU idleness cannot distinguish an abandoned process from an open
-# tab sitting at the prompt, so MAX_AGE_DAYS is the real guard. Upgrade to
-# checking whether the owning editor window still holds the IPC socket if a
-# live old session is ever killed.
+# shortcut: CPU idleness cannot tell an abandoned process from an open tab at
+# the prompt, so MAX_AGE_DAYS is the real guard. Upgrade to reaping on a dead
+# stdio peer if a live old session is ever killed.
 
 set -u
 
@@ -29,11 +19,11 @@ set +e
 MAX_AGE_DAYS="${CLAUDE_REAPER_MAX_AGE_DAYS:-3}"
 GRACE_SECONDS="${CLAUDE_REAPER_GRACE_SECONDS:-10}"
 CPU_SAMPLE_SECONDS="${CLAUDE_REAPER_CPU_SAMPLE_SECONDS:-60}"
+CPU_BUDGET_PERCENT="${CLAUDE_REAPER_CPU_BUDGET_PERCENT:-5}"
 PATTERN="${CLAUDE_REAPER_PATTERN:-extensions/anthropic\.claude-code-.*/resources/native-binary/claude}"
 
-# An unvalidated knob is worse than a wrong one: a non-numeric sleep interval
-# fails instantly under `set +e`, collapsing the sampling window to nothing and
-# removing the only guard between an old process and SIGKILL.
+# A non-numeric interval makes sleep fail instantly under `set +e`, collapsing
+# the window to nothing and removing the only guard before SIGKILL.
 require_int() {
   case "$2" in
   '' | *[!0-9]*)
@@ -45,13 +35,11 @@ require_int() {
 require_int MAX_AGE_DAYS "$MAX_AGE_DAYS"
 require_int GRACE_SECONDS "$GRACE_SECONDS"
 require_int CPU_SAMPLE_SECONDS "$CPU_SAMPLE_SECONDS"
-
-# The budget has to scale with the window: idle drift arrives in bursts, so a
-# fixed centisecond allowance is either tighter than one burst (reaps nothing,
-# the original bug) or looser than a short window can justify. Measured on this
-# machine: idle processes stay under 2% CPU, a process serving a turn ran 97%.
-CPU_BUDGET_PERCENT="${CLAUDE_REAPER_CPU_BUDGET_PERCENT:-5}"
 require_int CPU_BUDGET_PERCENT "$CPU_BUDGET_PERCENT"
+
+# Idle drift arrives in bursts, so the allowance has to scale with the window:
+# a fixed count is either tighter than one burst, which is what reaped nothing,
+# or looser than a short window justifies.
 CPU_BUDGET_CS=$((CPU_SAMPLE_SECONDS * CPU_BUDGET_PERCENT))
 
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/claude-reaper"
@@ -117,7 +105,10 @@ find_candidates() {
   '
 }
 
-# Total CPU time in centiseconds, for [[dd-]hh:]mm:ss.ff as ps prints it.
+# Total CPU time in centiseconds. macOS prints mm:ss.ff here and never rolls
+# minutes into hours, but the day and hour branches stay: reading hours as
+# minutes would undercount CPU 60-fold and reap a busy process as idle.
+# Total rather than utime, because syscall-bound work accrues stime.
 cpu_cs_of() {
   ps -o time= -p "$1" 2>/dev/null | awk '
     {
@@ -149,7 +140,7 @@ fi
 
 before=$(mktemp)
 trap 'rm -f "$before"' EXIT INT TERM
-echo "$candidates" | while IFS="$(printf '\t')" read -r pid age; do
+echo "$candidates" | while read -r pid _; do
   echo "$pid $(cpu_cs_of "$pid")"
 done >"$before"
 
@@ -174,7 +165,7 @@ while read -r pid age; do
   info "Reaping $pid (age ${age}) — ${spent}cs CPU over ${CPU_SAMPLE_SECONDS}s"
   idle="$idle $pid"
 done <<EOF
-$(echo "$candidates" | tr '\t' ' ')
+$candidates
 EOF
 
 if [ -z "$idle" ]; then
@@ -207,18 +198,16 @@ sleep "$GRACE_SECONDS"
 killed=0
 forced=0
 for pid in $signalled; do
-  if ! kill -0 "$pid" 2>/dev/null; then
-    killed=$((killed + 1))
-    continue
-  fi
-  if still_matches "$pid"; then
+  if kill -0 "$pid" 2>/dev/null; then
+    if ! still_matches "$pid"; then
+      warn "Not forcing $pid — no longer a Claude process, PID was reused"
+      vanished=$((vanished + 1))
+      continue
+    fi
     kill -KILL "$pid" 2>/dev/null
     forced=$((forced + 1))
-    killed=$((killed + 1))
-  else
-    warn "Not forcing $pid — no longer a Claude process, PID was reused"
-    vanished=$((vanished + 1))
   fi
+  killed=$((killed + 1))
 done
 
 info "Reaped $killed process(es), $forced needed SIGKILL, $active left running, $vanished gone"

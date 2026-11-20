@@ -95,41 +95,43 @@ bw-env() {
     echo "bw: item '$item' not found (after sync)"
     return 1
   fi
-  local exports
-  # Field names are interpolated into the string eval runs below, so anything
-  # that is not a bare identifier is vault-controlled shell code: validate.
-  exports=$(printf '%s' "$json" | python3 -c '
-import json, re, sys, shlex
+  # NUL-delimited name/value pairs rather than generated shell: a field name is
+  # vault-controlled, and `export "$name=$value"` can never evaluate it as code.
+  local name value loaded=0
+  while IFS= read -r -d '' name && IFS= read -r -d '' value; do
+    export "$name=$value"
+    loaded=$((loaded + 1))
+  done < <(printf '%s' "$json" | python3 -c '
+import json, re, sys
 item = json.load(sys.stdin)
-fields = item.get("fields") or []
-n = 0
-for f in fields:
+for f in item.get("fields") or []:
     name = f.get("name") or ""
     value = f.get("value")
     if not name or value is None:
         continue
     if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
-        print(f"bw: skipping field {name!r}: not a valid variable name", file=sys.stderr)
+        print(f"bw: skipping field {name!r}: not a usable variable name", file=sys.stderr)
         continue
-    print(f"export {name}={shlex.quote(value)}")
-    n += 1
-sys.exit(0 if n else 3)
-') || {
-    [[ $? -eq 3 ]] && echo "bw: item '$item' has no usable custom fields"
+    sys.stdout.write(f"{name}\0{value}\0")
+')
+  if ((loaded == 0)); then
+    echo "bw: item '$item' has no usable custom fields"
     return 1
-  }
-  eval "$exports"
+  fi
 }
 
 bw-env-list() {
   _bw_ensure_session || return 1
   bw list items --search "env/" 2>/dev/null | python3 -c '
-import json, sys
+import json, re, sys
+usable = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 for it in json.load(sys.stdin):
     name = it.get("name","")
     if name.startswith("env/"):
         fields = [f.get("name") for f in (it.get("fields") or []) if f.get("name")]
-        joined = ", ".join(fields) if fields else "(no fields)"
+        # Mark what bw-env would refuse, so the listing and the loader agree.
+        shown = [f if usable.fullmatch(f) else f"{f} (skipped)" for f in fields]
+        joined = ", ".join(shown) if shown else "(no fields)"
         print(f"{name}: {joined}")
 '
 }

@@ -6,8 +6,9 @@
     "interpreters.startupBehavior": "auto"
   },
   "[quarto]": {
-    "editor.formatOnSave": true
+    "editor.formatOnSave": false
   },
+  "quarto.visualEditor.markdownWrap": "sentence",
   "[html]": {
     "editor.formatOnSave": false
   },
@@ -97,5 +98,9 @@
     "OPENCODE_CONFIG_DIR": "${env:HOME}/.dotfiles/opencode"
   },
   "github.copilot.chat.customOAIModels": {},
-  "claudeCode.preferredLocation": "panel"
+  "claudeCode.preferredLocation": "panel",
+  "workbench.activityBar.location": "top",
+  "editor.accessibilitySupport": "off",
+  "git.openRepositoryInParentFolders": "never",
+  "claudeCode.hideOnboarding": true
 }

@@ -162,7 +162,17 @@
       "Edit(/Users/athanasm/.zshenv)",
       "Edit(/Users/athanasm/.zprofile)",
       "Edit(/Users/athanasm/Library/LaunchAgents/**)",
-      "Edit(/Users/athanasm/.ssh/**)"
+      "Edit(/Users/athanasm/.ssh/**)",
+      "Read(/Users/athanasm/.claude.json)",
+      "Read(/Users/athanasm/.claude/ide/**)",
+      "Read(/Users/athanasm/.claude/.credentials.json)",
+      "Read(/Users/athanasm/.npmrc)",
+      "Read(/Users/athanasm/.config/op/**)",
+      "Read(/Users/athanasm/.kube/**)",
+      "Read(/Users/athanasm/.netrc)",
+      "Read(/Users/athanasm/.docker/config.json)",
+      "Edit(/Users/athanasm/.bashrc)",
+      "Edit(/Users/athanasm/.profile)"
     ],
     "additionalDirectories": [
       "/tmp",

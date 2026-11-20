@@ -39,7 +39,7 @@ Defensive commit flow that prevents accidental staging of unrelated WIP and prot
      Overlaps were silently dropped because the merge keyed on start-time only.
      Now keys on (start, uid) so distinct events at the same minute survive.
 
-     Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+     Co-Authored-By: Claude <noreply@anthropic.com>
      EOF
      )"
      ```

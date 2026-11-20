@@ -79,5 +79,8 @@ README.pdf
 # LMM #
 #######
 .continue/
-.claude/
+.claude/*
+!.claude/settings.json
+!.claude/agents/
+!.claude/commands/
 .impeccable/

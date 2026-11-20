@@ -21,7 +21,7 @@ Functions and variables should be named clearly enough that comments are unneces
 
 ```r
 # Good: Self-explanatory without comments
-calculate_mean_cortical_thickness <- function(surface_data, 
+calculate_mean_cortical_thickness <- function(surface_data,
                                                region_labels,
                                                exclude_medial_wall = TRUE) {
   valid_vertices <- identify_valid_vertices(surface_data, exclude_medial_wall)
@@ -49,6 +49,7 @@ process_freesurfer_annotation <- function(annot_file) {
 ```
 
 **When comments ARE acceptable:**
+
 - Explaining workarounds for upstream bugs
 - Documenting non-obvious algorithm choices with citations
 - Noting technical constraints (e.g., file format quirks)
@@ -71,11 +72,23 @@ freesurfer_curv_read()
 ```
 
 **Naming conventions:**
+
 - Data reading functions: `read_*`
 - Data writing functions: `write_*`
 - Data transformation: `transform_*`, `convert_*`
 - Calculations: `calculate_*`, `compute_*`
 - Checks/validation: `is_*`, `has_*`, `validate_*`
+
+## Public API Only
+
+Never rely on internal/unexported functions — R's `tools:::` triple-colon internals, or another package's `pkg:::fn` — in package code unless the user explicitly approves it. Use the public, exported API; if it's missing what you need, that's a signal to request the upstream export or find another approach, not to reach for `:::`. (Test code has its own version of this rule in `r-testing`.)
+
+## Hard Rules
+
+- Never delete test files or vignette sections without explicit user approval
+- Preserve existing vignette content — only modify sections the user explicitly asks to change
+- Use roxygen2-level documentation (not Rd edits), prefer `cli` over `cat`/`message` for user-facing output
+- **Always run the full `R CMD check` (`devtools::check()` or `rcmdcheck::rcmdcheck(error_on = "warning")`) before committing** — `document()` + `testthat` + `lintr` are not enough; they miss whole classes of failures CI fails on (e.g. `checking Rd cross-references` WARNINGs from a `\link{}`/`[fn()]` to an unexported topic). CI fails on WARNINGs, not NOTEs, so `0 errors / 0 warnings` is the bar; pre-existing NOTEs you didn't introduce (e.g. moved URLs) are fine. The PostToolUse hook runs this automatically inside a package with a DESCRIPTION, but when editing a package outside its reach (a freshly cloned external repo/fork), run it by hand.
 
 ## Documentation Preferences
 
@@ -122,6 +135,27 @@ read_freesurfer_surface <- function(filepath) {
 #' [Users don't need implementation details in documentation]
 ```
 
+### Exported Docs Reference Only Exported Things
+
+Documentation for an exported function must only make users think about other
+_exported_ functions. Never name, describe, or link an internal (unexported)
+helper in an exported function's roxygen — users can't call it, it leaks
+implementation detail rather than explaining behaviour, and a `[internal_fn()]`
+markdown link becomes a `\link{internal_fn}` that fails `R CMD check` ("missing
+link / provide package anchors"). Describe `...` and behaviour in user terms
+(what they pass, what happens), not by pointing at internal plumbing.
+
+```r
+# Bad: exposes an internal helper users can't use
+#' @param ... passed to run_check_fs_cmd()
+
+# Good: user-facing
+#' @param ... Additional arguments controlling command execution, such as a timeout.
+```
+
+Only link (`[fn()]`) to EXPORTED topics; for internal helpers use plain code
+(`` `fn()` ``) or prose.
+
 ### Example-Driven Documentation
 
 Prioritize realistic examples over abstract descriptions:
@@ -153,13 +187,11 @@ Prioritize realistic examples over abstract descriptions:
 
 ### Vignettes
 
-Vignettes should use skill codex-voice and markdown.
-
+Vignettes should use skill codex-voice and markdown. Preserve existing content — only modify sections the user explicitly asks to change.
 
 ## Testing
 
 See the `r-testing` skill for all testing conventions.
-
 
 ## Updating NEWS.md
 
@@ -183,6 +215,7 @@ covr::package_coverage()          # Check coverage
 goodpractice::gp()                # Check best practice
 ```
 
+The PostToolUse hook already runs `air format` → `lintr::lint()` → `devtools::test()` → `devtools::check()` automatically on every `.R` edit (gated on finding a `DESCRIPTION` file) — `devtools::check()` re-documents via roxygen by default, so this pipeline is enforced automatically rather than being a manual pre-commit step.
 
 ### Pre-CRAN Checklist
 
@@ -229,6 +262,8 @@ Use `r-lib/actions` for standard R package workflows.
 ## Works Well With
 
 - `r-testing` — personal testing conventions
+- `r-release` — confirming distribution channel and executing a release
+- `cran-check` — CRAN-readiness check/fix loop
 - `r-lib:testing-r-packages` (Posit) — comprehensive testthat 3+ patterns
 - `open-source:release-post` (Posit) — release announcements
 - `straight-talk:codex-voice` — writing voice for vignettes
@@ -236,15 +271,17 @@ Use `r-lib/actions` for standard R package workflows.
 ## When to Use Me
 
 Use this skill when:
+
 - Setting up a new R package and want style guidance
 - Need preferences for code organization and naming
 - Updating documentation and vignettes
 - Want to understand the "no comments" philosophy
 
 **Do NOT use for:**
+
 - Testing patterns (use `r-testing` instead)
 - General R package structure (covered in Posit skills)
-- CRAN submission procedures (standard across packages)
+- CRAN submission (use `cran-check`) or release execution (use `r-release`)
 
 ## Quick Reference
 

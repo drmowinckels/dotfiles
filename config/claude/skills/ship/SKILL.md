@@ -27,7 +27,7 @@ End-to-end shipping flow: from a clean working tree of changes to a merged-ready
    - R: `devtools::test()` (and `devtools::check()` if package infrastructure changed)
    - Report counts; do not proceed if anything red.
 
-4. **Pre-merge review** — run the `pre-merge-review` skill (risk tier → green checks → parallel fresh-context reviewers → adversarial verification → fix → simplify → re-test). Do not proceed to commit until it reports clean. If the repo has no `REVIEW.md`, say so and offer `review-scaffold`; don't block on it.
+4. **Pre-merge review** — run the `pre-merge-review` skill (risk tier → green checks → parallel fresh-context reviewers → adversarial verification → fix → quality review → re-test). Do not proceed to commit until it reports clean. If the repo has no `REVIEW.md`, say so and offer `review-scaffold`; don't block on it.
 
 5. **Stage explicitly and commit**
    - List files to add explicitly — no `git add .` or `git add -A`

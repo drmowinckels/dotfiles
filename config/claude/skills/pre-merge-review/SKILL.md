@@ -1,6 +1,6 @@
 ---
 name: pre-merge-review
-description: Layered pre-PR review — green checks first, then parallel fresh-context reviewers, adversarial verification of every finding, fix, simplify, re-test. Use before opening or merging any final PR, or when the user asks for a "final review", "pre-merge check", or to run the review trio. Also invoked automatically by /ship.
+description: Layered pre-PR review — green checks first, then parallel fresh-context reviewers, adversarial verification of every finding, fix, quality review, re-test. Use before opening or merging any final PR, or when the user asks for a "final review", "pre-merge check", or to run the review trio. Also invoked automatically by /ship.
 ---
 
 # Pre-Merge Review
@@ -60,9 +60,13 @@ Fix **every** confirmed Important finding, not a subset. Re-run the relevant tes
 
 **New code ships with its tests in the same change.** For every new branch or changed behaviour, name the test that covers it. If you can't, that is itself an Important finding.
 
-## Phase 5 — Simplify, then re-test
+## Phase 5 — Quality review, then re-test
 
-Run `/simplify` last, once correctness and security fixes have landed, so it isn't tidying code that's about to change. It edits directly. Then run the full suite once more.
+Run `ponytail:ponytail-review` last, once correctness and security fixes have landed, so it isn't reviewing code that's about to change. Scope it to the fixes plus the diff they sit in.
+
+It reports and changes nothing, so apply the findings worth taking yourself: **Must fix** and **Should fix** get fixed, **Nice to have** is judgment — for each one you skip, say why in one line. Then run the full suite once more.
+
+Its lens is deliberately different from Phase 2's: those reviewers hunt correctness along one assigned dimension each, while this one asks whether every line needs to exist. A finding that only repeats a Phase 2 finding is not a new finding.
 
 ## Phase 6 — Converge or stop
 
@@ -77,7 +81,7 @@ Track the round count.
 - Important findings: confirmed, fixed
 - Findings raised but **rejected in verification** — count only, with one example. This number is the health metric for the reviewers; if it's consistently high, the prompts or `REVIEW.md` need work.
 - Nits taken vs skipped, with reasons
-- What `/simplify` changed
+- What `ponytail-review` found, and what you applied vs skipped
 - Final test counts and check status
 - Rounds used
 

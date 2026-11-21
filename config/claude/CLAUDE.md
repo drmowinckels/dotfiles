@@ -55,7 +55,7 @@ R work is frequent here — proactively load the `r-package` skill (style, docs,
 # PR Workflow
 
 - After implementing changes, open a PR and shepherd it to green CI before declaring done
-- Before any final PR/merge, run the `pre-merge-review` skill (risk tier → green checks → parallel fresh-context reviewers → verification → fix → simplify) — `ship` already does this automatically
+- Before any final PR/merge, run the `pre-merge-review` skill (risk tier → green checks → parallel fresh-context reviewers → verification → fix → ponytail-review) — `ship` already does this automatically
 - PR bodies follow the repo template: Summary / Testing / Risk tier / How to revert. Classify risk from `.github/RISK_TIERS.md`, not from how confident the change feels
 - Repos get their reviewer contract from `REVIEW.md` at the root — install it with `review-scaffold` if missing
 - Every bug that escapes to users becomes a case in `.review/cases/` via `review-eval`, and the layer that missed it gets fixed, not just the bug

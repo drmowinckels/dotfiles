@@ -22,3 +22,9 @@ config/claude/skills/synced/
 config/claude/state/
 config/claude/chrome/
 config/claude/.last-cleanup
+config/claude/daemon/
+config/claude/jobs/
+config/claude/ponytail-modes/
+config/claude/ponytail-statusline.sh
+config/claude/.ponytail-active
+config/claude/.ponytail-statusline-nudged
